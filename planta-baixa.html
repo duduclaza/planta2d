@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planta Baixa — Editor 2D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/library.css">
+<link rel="stylesheet" href="css/stage.css">
+<link rel="stylesheet" href="css/properties-panel.css">
+<link rel="stylesheet" href="css/overlays.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e08a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/></svg>
+      Planta Baixa <span class="sub">Editor 2D</span>
+    </div>
+    <input id="projName" value="Projeto sem título" spellcheck="false">
+    <div class="spacer"></div>
+    <button class="hbtn" id="btnNew"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo</button>
+    <button class="hbtn" id="btnOpen"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H3z"/></svg>Abrir</button>
+    <button class="hbtn" id="btnSave"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Salvar</button>
+    <button class="hbtn" id="btnPng"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>PNG</button>
+    <button class="hbtn primary" id="btnPrint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Imprimir</button>
+    <input type="file" id="fileInput" accept=".json,application/json">
+  </header>
+
+  <div class="body">
+    <div class="rail" id="rail"></div>
+
+    <aside class="lib" id="lib">
+      <div class="libtabs">
+        <div class="libtab active" data-tab="constr">Construção</div>
+        <div class="libtab" data-tab="furni">Móveis</div>
+      </div>
+      <div class="libscroll" id="libConstr"></div>
+      <div class="libscroll" id="libFurni" style="display:none"></div>
+    </aside>
+
+    <div class="stage" id="stage">
+      <canvas id="grid"></canvas>
+      <canvas id="main"></canvas>
+      <canvas id="cursorCanvas"></canvas>
+      <button class="collapseBtn" id="collapseBtn" title="Mostrar/ocultar biblioteca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+
+      <div class="props" id="props"></div>
+      <div class="ctxmenu" id="ctxMenu"></div>
+
+      <div class="welcome" id="welcome">
+        <div class="card">
+          <h2>Bem-vindo 👋</h2>
+          <p>Editor de planta baixa 2D no estilo Planner: desenhe paredes com a espessura que quiser, encaixe portas e janelas, delimite cômodos e monte a mobília por ambiente.</p>
+          <ul>
+            <li>Na aba <b>Construção</b>, escolha a espessura e desenhe a <b>Parede</b> (clique em cada canto · Enter finaliza).</li>
+            <li>Selecione qualquer item e ajuste as <b>medidas numéricas</b> no painel da direita.</li>
+            <li>Na aba <b>Móveis</b>, escolha por cômodo e clique pra soltar no desenho.</li>
+            <li>Roda = zoom · botão do meio (ou Espaço) = mover · Delete apaga.</li>
+          </ul>
+          <button class="hbtn primary" id="startBtn" style="width:100%;justify-content:center">Começar a desenhar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status">
+    <span id="coord">0,00 m · 0,00 m</span>
+    <label class="toggle"><input type="checkbox" id="snapChk" checked> Encaixe (0,25 m)</label>
+    <span class="hint" id="hint"></span>
+    <span class="grow"></span>
+    <span id="counts"></span>
+    <div class="zoombtns">
+      <button id="zoomOut">−</button><span id="zoomLbl" style="min-width:46px;text-align:center">100%</span><button id="zoomIn">+</button>
+      <button id="zoomFit" style="width:auto;padding:0 8px">Ajustar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/catalogs.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/floor-detection.js"></script>
+<script src="js/history.js"></script>
+<script src="js/render.js"></script>
+<script src="js/hit-test.js"></script>
+<script src="js/interactions.js"></script>
+<script src="js/properties-panel.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/ui-library.js"></script>
+<script src="js/actions.js"></script>
+<script src="js/zoom-status.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+:root{
+  --chrome:#1d2530; --header:#232c39; --surface:#2b3543; --surface2:#313c4b; --border:#36414f;
+  --paper:#fbfaf6; --grid-min:#e7e9e4; --grid-maj:#d2d6cf;
+  --wall:#2a2f37; --ink:#eef1f4; --muted:#93a0b0;
+  --accent:#e08a3c; --accent-2:#4a90c2; --danger:#d9544f; --ok:#5aa469;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}

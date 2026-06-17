@@ -1,0 +1,13 @@
+.welcome{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(20,25,33,.6);backdrop-filter:blur(2px);z-index:40}
+.welcome .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 28px;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.welcome h2{margin:0 0 6px;font-size:20px;letter-spacing:-.02em}
+.welcome p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.55}
+.welcome ul{margin:0 0 18px;padding-left:18px;font-size:13px;line-height:1.7}
+.welcome ul b{color:var(--accent)}
+.ctxmenu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 34px rgba(0,0,0,.5);padding:5px;min-width:158px;display:none;font:600 13px 'Inter'}
+.ctxmenu.show{display:block}
+.ctxmenu .label{padding:7px 11px 5px;color:var(--muted);font:700 11px 'Inter';text-transform:uppercase;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctxmenu .ci{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;cursor:pointer;color:var(--ink)}
+.ctxmenu .ci:hover{background:var(--chrome)}
+.ctxmenu .ci.danger{color:var(--danger)}
+.ctxmenu .ci.danger:hover{background:var(--danger);color:#fff}
