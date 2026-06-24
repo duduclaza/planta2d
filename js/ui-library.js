@@ -185,8 +185,9 @@ function bindCustomLibrary(){
     inp.onchange=()=>{
       const file=inp.files&&inp.files[0];if(!file)return;
       const reader=new FileReader();
-      reader.onload=()=>{
-        const dataUrl=reader.result;
+      reader.onload=async()=>{
+        const rawUrl=reader.result;
+        const dataUrl=await maybeRemoveBackground(rawUrl);
         getFurnitureImage(dataUrl,()=>{
           if(!_imgCache[dataUrl]||!_imgCache[dataUrl].loaded){alert('Não foi possível carregar essa imagem.');return;}
           const name=(prompt('Nome do item:','Meu móvel')||'').trim()||'Meu móvel';

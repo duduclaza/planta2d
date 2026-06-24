@@ -829,7 +829,7 @@ function drawSelectionRef(s){const sc=scl();if(!s)return;
     if(!f.locked){
       const ra=rotPos(f);c.fillStyle='#e08a3c';c.beginPath();c.arc(ra[0],ra[1],6,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();
       const a=f.angle||0,cosA=Math.cos(a),sinA=Math.sin(a);
-      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sy])=>{const lx=sx*w/2,ly=sy*h/2;handle(cx+lx*cosA-ly*sinA,cy+lx*sinA+ly*cosA);});
+      [[-1,-1],[1,-1],[-1,1],[1,1],[0,-1],[0,1],[-1,0],[1,0]].forEach(([sx,sy])=>{const lx=sx*w/2,ly=sy*h/2;handle(cx+lx*cosA-ly*sinA,cy+lx*sinA+ly*cosA);});
     }}
   else if(s.kind==='opening'){const o=state.openings.find(x=>x.id===s.id);if(!o)return;const dx=Math.cos(o.angle),dy=Math.sin(o.angle);[-1,1].forEach(sg=>handle(...toScreen(o.x+sg*dx*o.width/2,o.y+sg*dy*o.width/2)));}
   else if(s.kind==='measure'){const m=(state.measures||[]).find(o=>o.id===s.id);if(!m)return;handle(...toScreen(m.x1,m.y1));handle(...toScreen(m.x2,m.y2));}

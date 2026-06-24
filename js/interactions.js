@@ -183,9 +183,9 @@ function onDown(e){const m=getMouse(e);mainC.setPointerCapture(e.pointerId);
   if(sel&&sel.kind==='furniture'){const f=state.furniture.find(o=>o.id===sel.id);if(f&&!f.locked){
     const rh=rotPos(f);if(Math.hypot(rh[0]-m.sx,rh[1]-m.sy)<10){pushHistory();drag={mode:'rotate',f};return;}
     const a=f.angle||0,cosA=Math.cos(a),sinA=Math.sin(a),w=f.w*scl(),h=f.h*scl(),[cx,cy]=toScreen(f.x,f.y);
-    for(const[sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){
+    for(const[sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1],[0,-1],[0,1],[-1,0],[1,0]]){
       const lx=sx*w/2,ly=sy*h/2,hx=cx+lx*cosA-ly*sinA,hy=cy+lx*sinA+ly*cosA;
-      if(Math.hypot(hx-m.sx,hy-m.sy)<10){pushHistory();drag={mode:'furnitureresize',f};return;}
+      if(Math.hypot(hx-m.sx,hy-m.sy)<10){pushHistory();drag={mode:'furnitureresize',f,sx,sy};return;}
     }
   }}
   if(sel&&sel.kind==='text'){const t=state.texts.find(o=>o.id===sel.id);if(t){const rh=rotPosText(t);if(Math.hypot(rh[0]-m.sx,rh[1]-m.sy)<10){pushHistory();drag={mode:'rotateText',t};return;}}}
@@ -230,7 +230,10 @@ function onMove(e){const m=getMouse(e);mouseW={x:m.wx,y:m.wy};
     else if(drag.mode==='wallmove'){const dx=m.wx-drag.start.x,dy=m.wy-drag.start.y;drag.members.forEach(mb=>{mb.w['x'+mb.ep]=snap(mb.ox+dx);mb.w['y'+mb.ep]=snap(mb.oy+dy);});refreshRoomBounds();draw();renderProps();}
     else if(drag.mode==='rotate'){drag.f.angle=Math.round((Math.atan2(m.wy-drag.f.y,m.wx-drag.f.x)+Math.PI/2)/(Math.PI/12))*(Math.PI/12);draw();renderProps();}
     else if(drag.mode==='furnitureresize'){const f=drag.f,a=f.angle||0,dx=m.wx-f.x,dy=m.wy-f.y,ca=Math.cos(-a),sa=Math.sin(-a);
-      const lx=dx*ca-dy*sa,ly=dx*sa+dy*ca;f.w=Math.max(0.1,Math.abs(lx)*2);f.h=Math.max(0.1,Math.abs(ly)*2);draw();renderProps();}
+      const lx=dx*ca-dy*sa,ly=dx*sa+dy*ca;
+      if(drag.sx!==0)f.w=Math.max(0.1,Math.abs(lx)*2);
+      if(drag.sy!==0)f.h=Math.max(0.1,Math.abs(ly)*2);
+      draw();renderProps();}
     else if(drag.mode==='rotateText'){const tm=textMetrics(drag.t),cx=drag.t.x+tm.w/2,cy=drag.t.y+tm.h/2;drag.t.angle=Math.round((Math.atan2(m.wy-cy,m.wx-cx)+Math.PI/2)/(Math.PI/12))*(Math.PI/12);draw();renderProps();}
     else if(drag.mode==='wallpt'){const sp=drag.solo?gridPoint(m.wx,m.wy):snapPoint(m.wx,m.wy,drag.exc);drag.group.forEach(gp=>{gp.w['x'+gp.ep]=sp.x;gp.w['y'+gp.ep]=sp.y;});refreshRoomBounds();draw();renderProps();}
     else if(drag.mode==='measurept'){const sp=snapPoint(m.wx,m.wy);drag.m['x'+drag.ep]=sp.x;drag.m['y'+drag.ep]=sp.y;draw();renderProps();}
