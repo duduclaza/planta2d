@@ -822,7 +822,7 @@ function drawSelectionRef(s){const sc=scl();if(!s)return;
   else if(s.kind==='opening'){const o=state.openings.find(x=>x.id===s.id);if(!o)return;const dx=Math.cos(o.angle),dy=Math.sin(o.angle);[-1,1].forEach(sg=>handle(...toScreen(o.x+sg*dx*o.width/2,o.y+sg*dy*o.width/2)));}
   else if(s.kind==='measure'){const m=(state.measures||[]).find(o=>o.id===s.id);if(!m)return;handle(...toScreen(m.x1,m.y1));handle(...toScreen(m.x2,m.y2));}
   else if(s.kind==='group'){const g=(state.groups||[]).find(o=>o.id===s.id);if(g)(g.items||[]).forEach(r=>drawSelectionRef(r));}
-  else if(s.kind==='text'){const t=state.texts.find(o=>o.id===s.id);if(!t)return;const[x,y]=toScreen(t.x,t.y);c.font=`600 ${t.size||14}px 'Inter'`;const w=c.measureText(t.text).width;c.strokeStyle='#e08a3c';c.lineWidth=1.5;c.strokeRect(x-4,y-4,w+8,(t.size||14)+8);}}
+  else if(s.kind==='text'){const t=state.texts.find(o=>o.id===s.id);if(!t)return;const[x,y]=toScreen(t.x,t.y);c.font=`600 ${t.size||14}px 'Inter'`;const w=c.measureText(t.text).width;c.strokeStyle='#e08a3c';c.lineWidth=1.5;c.strokeRect(x-8,y-8,w+16,(t.size||14)+16);}}
 function handle(x,y){c.fillStyle='#fff';c.strokeStyle='#e08a3c';c.lineWidth=2;c.beginPath();c.rect(x-5,y-5,10,10);c.fill();c.stroke();}
 function rotPos(f){const sc=scl(),dy=-(f.h*sc/2+22),a=f.angle||0,rx=-(-dy)*0+(-dy)*0;const px=0*Math.cos(a)-dy*Math.sin(a),py=0*Math.sin(a)+dy*Math.cos(a);const[cx,cy]=toScreen(f.x,f.y);return[cx+px,cy+py];}
 function rr(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
