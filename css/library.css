@@ -34,6 +34,12 @@
 .planitem canvas.libicon{width:76px!important;height:76px!important;margin:0 auto 4px;background:#fbfaf6;border:1px solid #dedbd0;border-radius:6px}
 .planitem .nm{min-height:31px;margin-top:3px;color:#26303b}
 .planitem .dm{color:#7b8490}
+.addCustomItem{display:flex;flex-direction:column;align-items:center;justify-content:center;border-style:dashed;color:#9aa3ad}
+.addCustomItem svg{color:#9aa3ad}
+.addCustomItem:hover{color:var(--accent);border-color:var(--accent)}
+.customItem{position:relative}
+.customDel{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:1px solid #d9d6ca;background:#fff;color:#9aa3ad;font:700 12px/16px 'Inter';cursor:pointer;z-index:2;padding:0}
+.customDel:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
 .thickrow{display:flex;gap:6px;margin:4px 2px 2px}
 .thickrow button{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:9px 0;font:600 13px 'Inter';cursor:pointer}
 .thickrow button.sel{border-color:var(--accent);background:#3a3326;color:var(--accent)}

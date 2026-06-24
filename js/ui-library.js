@@ -157,7 +157,63 @@ function bindFurnitureThemeControl(){
 function buildFurni(){
   buildGroupedLibrary('libFurni',FURNI,'furni',markLib2);
   const el=document.getElementById('libFurni');
-  if(el){el.insertAdjacentHTML('afterbegin',buildFurnitureThemeControl());bindFurnitureThemeControl();}
+  if(el){
+    el.insertAdjacentHTML('afterbegin',buildFurnitureThemeControl());bindFurnitureThemeControl();
+    el.insertAdjacentHTML('beforeend',buildCustomLibraryHtml());bindCustomLibrary();
+  }
+}
+function buildCustomLibraryHtml(){
+  return `<div class="roomgrp open">
+    <button class="roomhead" type="button"><span>Minha biblioteca</span><b>${customFurniture.length}</b></button>
+    <div class="grid2 furnigrid">
+      <div class="libitem planitem addCustomItem" id="addCustomImage">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <div class="nm">Adicionar imagem</div>
+      </div>
+      ${customFurniture.map(it=>`<div class="libitem planitem customItem" data-custom="${it.kind}">
+        <button class="customDel" data-del="${it.kind}" title="Remover">×</button>
+        <canvas class="libicon"></canvas>
+        <div class="nm">${it.label}</div><div class="dm">${it.w.toFixed(2).replace('.',',')}×${it.h.toFixed(2).replace('.',',')} m</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+function bindCustomLibrary(){
+  const addBtn=document.getElementById('addCustomImage');
+  if(addBtn)addBtn.onclick=()=>{
+    const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+    inp.onchange=()=>{
+      const file=inp.files&&inp.files[0];if(!file)return;
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const name=(prompt('Nome do item:','Meu móvel')||'').trim()||'Meu móvel';
+        const w=Math.max(0.05,parseFloat((prompt('Largura (m):','0,60')||'0,6').replace(',','.'))||0.6);
+        const h=Math.max(0.05,parseFloat((prompt('Profundidade (m):','0,60')||'0,6').replace(',','.'))||0.6);
+        addCustomFurnitureItem(name,w,h,reader.result);
+        buildFurni();
+      };
+      reader.readAsDataURL(file);
+    };
+    inp.click();
+  };
+  document.querySelectorAll('#libFurni .customItem').forEach(d=>{
+    const kind=d.dataset.custom,it=customFurniture.find(c=>c.kind===kind);if(!it)return;
+    drawLibIcon(d.querySelector('canvas.libicon'),it.kind,it.w,it.h);
+    d.onclick=(e)=>{
+      if(e.target.closest('.customDel'))return;
+      pendingFurniture=[it.kind,it.label,it.w,it.h];setTool('furniture');
+      document.querySelectorAll('#libFurni .libitem').forEach(x=>x.classList.toggle('sel',x===d));
+      setHint('Clique no desenho pra soltar: '+it.label);
+    };
+  });
+  document.querySelectorAll('#libFurni .customDel').forEach(b=>{
+    b.onclick=(e)=>{
+      e.stopPropagation();
+      if(!confirm('Remover este item da sua biblioteca?'))return;
+      removeCustomFurnitureItem(b.dataset.del);
+      buildFurni();
+    };
+  });
 }
 
 document.querySelectorAll('.libtab').forEach(t=>t.onclick=()=>{

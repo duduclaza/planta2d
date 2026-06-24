@@ -238,7 +238,8 @@ function getFurnitureImageCandidate(sources, callback){
 
 function drawFurnitureShape(ctx,kind,w,h,lineWidth){
   const theme=typeof furnitureTheme==='undefined'?'clean3d':furnitureTheme;
-  if(!_drawingLibIcon&&theme==='humanized'&&typeof FURNITURE_IMAGES !== 'undefined' && FURNITURE_IMAGES[kind]) {
+  const isCustom=typeof CUSTOM_FURNITURE_KINDS!=='undefined'&&CUSTOM_FURNITURE_KINDS.has(kind);
+  if((isCustom||(!_drawingLibIcon&&theme==='humanized'))&&typeof FURNITURE_IMAGES !== 'undefined' && FURNITURE_IMAGES[kind]) {
      const cache = getFurnitureImageCandidate(FURNITURE_IMAGES[kind], () => {
          if(typeof draw==='function') draw();
      });
