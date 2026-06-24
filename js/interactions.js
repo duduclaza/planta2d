@@ -174,10 +174,14 @@ function onDown(e){const m=getMouse(e);mainC.setPointerCapture(e.pointerId);
     measureA=sp;setHint('Clique no segundo ponto para fixar a medida.');draw();return;}
   if(tool==='door'||tool==='window'){const nw=nearestWall(m.wx,m.wy);if(nw){pushHistory();const ang=Math.atan2(nw.w.y2-nw.w.y1,nw.w.x2-nw.w.x1);const o={id:newId(),type:tool,subtype:tool==='door'?doorSub:winSub,x:nw.p.x,y:nw.p.y,angle:ang,t:nw.w.t||defaultWallT,width:tool==='door'?(doorSub==='dupla'?1.4:doorSub==='incendio'?0.9:0.8):(winSub==='ampla'?2.0:1.2),hinge:-1,flip:1};state.openings.push(o);placeSelect('opening',o.id,'Adicionada — arraste as pontas ou digite a largura no painel.');}else setHint('Clique em cima de uma parede.');return;}
   if(tool==='furniture'){if(!pendingFurniture){setHint('Escolha um item na biblioteca.');return;}pushHistory();const sp=snapPoint(m.wx,m.wy);const f={id:newId(),kind:pendingFurniture[0],x:sp.x,y:sp.y,w:pendingFurniture[2],h:pendingFurniture[3],angle:0,label:pendingFurniture[1]};state.furniture.push(f);placeSelect('furniture',f.id,'Item adicionado — gire ou redimensione no painel da direita.');return;}
-  if(tool==='text'){const txt=prompt('Texto:');if(txt){pushHistory();state.texts.push({id:newId(),x:snap(m.wx),y:snap(m.wy),text:txt,size:14});draw();afterChange();}return;}
+  if(tool==='text'){
+    const hit=hitTest(m.wx,m.wy);
+    if(hit&&hit.kind==='text'){selectOnly(hit);pushHistory();drag={mode:'move',start:{x:m.wx,y:m.wy},kind:'text',id:hit.id,orig:JSON.parse(JSON.stringify(ent(hit)))};renderProps();draw();return;}
+    const txt=prompt('Texto:');if(txt){pushHistory();state.texts.push({id:newId(),x:snap(m.wx),y:snap(m.wy),text:txt,size:14});draw();afterChange();}return;}
   // SELECT
   if(tool==='select'&&e.shiftKey){const h=hitTest(m.wx,m.wy);if(h){toggleMulti(h);setHint(multiSel.length+' objetos selecionados. Clique direito para agrupar.');}draw();renderProps();return;}
   if(sel&&sel.kind==='furniture'){const f=state.furniture.find(o=>o.id===sel.id);if(f&&!f.locked){const rh=rotPos(f);if(Math.hypot(rh[0]-m.sx,rh[1]-m.sy)<10){pushHistory();drag={mode:'rotate',f};return;}}}
+  if(sel&&sel.kind==='text'){const t=state.texts.find(o=>o.id===sel.id);if(t){const rh=rotPosText(t);if(Math.hypot(rh[0]-m.sx,rh[1]-m.sy)<10){pushHistory();drag={mode:'rotateText',t};return;}}}
   if(sel&&sel.kind==='room'){const r=state.rooms.find(o=>o.id===sel.id);if(r&&!r.locked){const[x,y]=toScreen(r.x,r.y),w=r.w*scl(),h=r.h*scl();for(const cn of [[x,y,'tl'],[x+w,y,'tr'],[x,y+h,'bl'],[x+w,y+h,'br']])if(Math.hypot(cn[0]-m.sx,cn[1]-m.sy)<10){pushHistory();drag={mode:'roomresize',r,corner:cn[2]};return;}}}
   if(sel&&sel.kind==='floor'){const f=(state.floors||[]).find(o=>o.id===sel.id);if(f&&!f.locked){const[x,y]=toScreen(f.x,f.y),w=f.w*scl(),h=f.h*scl();for(const cn of [[x,y,'tl'],[x+w,y,'tr'],[x,y+h,'bl'],[x+w,y+h,'br']])if(Math.hypot(cn[0]-m.sx,cn[1]-m.sy)<10){pushHistory();drag={mode:'floorresize',f,corner:cn[2]};return;}}}
   if(sel&&sel.kind==='wall'){const w=state.walls.find(o=>o.id===sel.id);if(w&&!w.locked)for(const ep of ['1','2']){const px=w['x'+ep],py=w['y'+ep],[hx,hy]=toScreen(px,py);if(Math.hypot(hx-m.sx,hy-m.sy)<11){pushHistory();const group=e.altKey?[{w,ep}]:connectedEndpointRefs(w,ep),exc=new Set(group.map(g=>g.w.id));drag={mode:'wallpt',group,exc,solo:e.altKey||endpointDetached(w,ep)};return;}}}
@@ -218,6 +222,7 @@ function onMove(e){const m=getMouse(e);mouseW={x:m.wx,y:m.wy};
       else{e2.x=snap(drag.orig.x+dx);e2.y=snap(drag.orig.y+dy);if(drag.kind==='room')syncRoomWalls(e2);}draw();}
     else if(drag.mode==='wallmove'){const dx=m.wx-drag.start.x,dy=m.wy-drag.start.y;drag.members.forEach(mb=>{mb.w['x'+mb.ep]=snap(mb.ox+dx);mb.w['y'+mb.ep]=snap(mb.oy+dy);});refreshRoomBounds();draw();renderProps();}
     else if(drag.mode==='rotate'){drag.f.angle=Math.round((Math.atan2(m.wy-drag.f.y,m.wx-drag.f.x)+Math.PI/2)/(Math.PI/12))*(Math.PI/12);draw();renderProps();}
+    else if(drag.mode==='rotateText'){const tm=textMetrics(drag.t),cx=drag.t.x+tm.w/2,cy=drag.t.y+tm.h/2;drag.t.angle=Math.round((Math.atan2(m.wy-cy,m.wx-cx)+Math.PI/2)/(Math.PI/12))*(Math.PI/12);draw();renderProps();}
     else if(drag.mode==='wallpt'){const sp=drag.solo?gridPoint(m.wx,m.wy):snapPoint(m.wx,m.wy,drag.exc);drag.group.forEach(gp=>{gp.w['x'+gp.ep]=sp.x;gp.w['y'+gp.ep]=sp.y;});refreshRoomBounds();draw();renderProps();}
     else if(drag.mode==='measurept'){const sp=snapPoint(m.wx,m.wy);drag.m['x'+drag.ep]=sp.x;drag.m['y'+drag.ep]=sp.y;draw();renderProps();}
     else if(drag.mode==='measuremove'){const dx=snap(m.wx-drag.start.x),dy=snap(m.wy-drag.start.y);drag.m.x1=drag.orig.x1+dx;drag.m.y1=drag.orig.y1+dy;drag.m.x2=drag.orig.x2+dx;drag.m.y2=drag.orig.y2+dy;draw();renderProps();}

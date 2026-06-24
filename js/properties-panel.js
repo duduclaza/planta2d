@@ -131,10 +131,12 @@ function renderPropsInner(){
   } else if(sel.kind==='text'){
     propsEl.innerHTML=pHead('<path d="M4 7V5h16v2M9 5v14M9 19h6"/>','Texto')+`<div class="pbody">
       <div class="prow"><label>Conteúdo</label><input type="text" id="tT" value="${(o.text||'').replace(/"/g,'&quot;')}"></div>
-      <div class="prow"><label>Tamanho</label><div class="unit" data-u="px"><input type="number" id="tS" value="${o.size||14}" min="8" step="1"></div></div>
+      <div class="two"><div class="prow"><label>Tamanho</label><div class="unit" data-u="px"><input type="number" id="tS" value="${o.size||14}" min="8" step="1"></div></div>
+      <div class="prow"><label>Rotação</label><div class="unit" data-u="°"><input type="number" id="tA" value="${Math.round((o.angle||0)*180/Math.PI)}" step="15"></div></div></div>
       <div class="prow"><button class="delbtn" id="del"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg> Apagar texto</button></div></div>`;
     document.getElementById('tT').oninput=e=>{o.text=e.target.value;draw();};
     document.getElementById('tS').oninput=e=>{pushHistory();o.size=Math.max(8,+e.target.value||14);draw();};
+    document.getElementById('tA').oninput=e=>{pushHistory();o.angle=(+e.target.value||0)*Math.PI/180;draw();};
   }
   const del=document.getElementById('del');if(del)del.onclick=()=>{pushHistory();deleteSel();};
 }

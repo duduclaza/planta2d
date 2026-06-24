@@ -92,7 +92,7 @@ function categoryImageFolders(category){
   if(slug.includes('lavanderia'))return ['lavanderia'];
   if(slug.includes('escrit'))return ['escritorio'];
   if(slug.includes('lazer')||slug.includes('academia'))return ['lazeracademia'];
-  if(slug.includes('externa')&&slug.includes('garagem'))return ['areaexternagaragem','areaexterna'];
+  if(slug.includes('externa')&&slug.includes('garagem'))return ['areaexternagaragem','areaexterna','veiculos'];
   if(slug.includes('externa'))return ['areaexterna'];
   return ['geral'];
 }
@@ -134,6 +134,7 @@ registerStyledFurnitureImages(CONSTR_ITEMS.map(([category,items])=>[category,ite
     ])
   ];
 });
+FURNITURE_IMAGES['carro']=[...(FURNITURE_IMAGES['carro']||[]),...FURNITURE_IMAGE_BASES.map(base=>`${base}/Veiculos/carr.png`)];
 
 const TOOLS = [
   ['select','Selecionar / mover','V','<path d="M4 3l7 17 2.5-7L21 11z"/>'],

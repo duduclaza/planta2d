@@ -133,7 +133,13 @@ function fillCurrentPathWithMaterial(ctx,matId,color,alpha,opt){
 }
 function drawFloorArea(f){const[x,y]=toScreen(f.x,f.y),w=f.w*scl(),h=f.h*scl(),mat=materialInfo(f.material),tile=f.tileSize||mat[3]||0.6;c.beginPath();c.rect(x,y,w,h);fillCurrentPathWithMaterial(c,f.material,f.color||mat[2],0.82,{patternPx:tile*scl()});c.strokeStyle=hexA('#2a2f37',0.28);c.lineWidth=1.2;c.strokeRect(x,y,w,h);}
 
-function drawText(t){const[x,y]=toScreen(t.x,t.y);c.font=`600 ${t.size||14}px 'Inter'`;c.fillStyle='#2a2f37';c.textAlign='left';c.textBaseline='top';c.fillText(t.text,x,y);}
+function textMetrics(t){c.font=`600 ${t.size||14}px 'Inter'`;return{w:c.measureText(t.text).width/scl(),h:(t.size||14)/scl()};}
+function drawText(t){const m=textMetrics(t),[cx,cy]=toScreen(t.x+m.w/2,t.y+m.h/2);
+  c.font=`600 ${t.size||14}px 'Inter'`;c.save();c.translate(cx,cy);c.rotate(t.angle||0);
+  c.fillStyle='#2a2f37';c.textAlign='center';c.textBaseline='middle';c.fillText(t.text,0,0);c.restore();}
+function rotPosText(t){const m=textMetrics(t),sc=scl(),dy=-(m.h*sc/2+8+22),a=t.angle||0;
+  const px=-dy*Math.sin(a),py=dy*Math.cos(a),[cx,cy]=toScreen(t.x+m.w/2,t.y+m.h/2);
+  return[cx+px,cy+py];}
 
 const _furnPatCache = {};
 function getFurniturePattern(ctx, type, baseCol){
@@ -822,7 +828,10 @@ function drawSelectionRef(s){const sc=scl();if(!s)return;
   else if(s.kind==='opening'){const o=state.openings.find(x=>x.id===s.id);if(!o)return;const dx=Math.cos(o.angle),dy=Math.sin(o.angle);[-1,1].forEach(sg=>handle(...toScreen(o.x+sg*dx*o.width/2,o.y+sg*dy*o.width/2)));}
   else if(s.kind==='measure'){const m=(state.measures||[]).find(o=>o.id===s.id);if(!m)return;handle(...toScreen(m.x1,m.y1));handle(...toScreen(m.x2,m.y2));}
   else if(s.kind==='group'){const g=(state.groups||[]).find(o=>o.id===s.id);if(g)(g.items||[]).forEach(r=>drawSelectionRef(r));}
-  else if(s.kind==='text'){const t=state.texts.find(o=>o.id===s.id);if(!t)return;const[x,y]=toScreen(t.x,t.y);c.font=`600 ${t.size||14}px 'Inter'`;const w=c.measureText(t.text).width;c.strokeStyle='#e08a3c';c.lineWidth=1.5;c.strokeRect(x-8,y-8,w+16,(t.size||14)+16);}}
+  else if(s.kind==='text'){const t=state.texts.find(o=>o.id===s.id);if(!t)return;const m=textMetrics(t),wpx=m.w*sc,hpx=m.h*sc,[cx,cy]=toScreen(t.x+m.w/2,t.y+m.h/2);
+    c.save();c.translate(cx,cy);c.rotate(t.angle||0);c.strokeStyle='#e08a3c';c.lineWidth=1.5;c.strokeRect(-wpx/2-8,-hpx/2-8,wpx+16,hpx+16);
+    c.beginPath();c.moveTo(0,-hpx/2-8);c.lineTo(0,-hpx/2-8-22);c.stroke();c.restore();
+    const ra=rotPosText(t);c.fillStyle='#e08a3c';c.beginPath();c.arc(ra[0],ra[1],6,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();}}
 function handle(x,y){c.fillStyle='#fff';c.strokeStyle='#e08a3c';c.lineWidth=2;c.beginPath();c.rect(x-5,y-5,10,10);c.fill();c.stroke();}
 function rotPos(f){const sc=scl(),dy=-(f.h*sc/2+22),a=f.angle||0,rx=-(-dy)*0+(-dy)*0;const px=0*Math.cos(a)-dy*Math.sin(a),py=0*Math.sin(a)+dy*Math.cos(a);const[cx,cy]=toScreen(f.x,f.y);return[cx+px,cy+py];}
 function rr(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
