@@ -1,5 +1,15 @@
 name = "planta2d"
+main = "src/worker.js"
 compatibility_date = "2026-06-17"
 
 [assets]
 directory = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "planta2d-db"
+database_id = "4730c569-1dc0-4681-8760-7949080fbb73"
+
+[[mtls_certificates]]
+binding = "EFI_MTLS"
+certificate_id = "1ea86caa-978c-480c-b1c3-25954dff2b39"

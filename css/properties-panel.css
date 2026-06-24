@@ -1,4 +1,10 @@
 .props{position:absolute;top:12px;right:12px;width:262px;background:var(--surface);border:1px solid var(--border);border-radius:13px;box-shadow:0 14px 44px rgba(0,0,0,.45);z-index:14;overflow:hidden}
+.props.hidden{display:none}
+.propsShowBtn{display:none;position:absolute;top:12px;right:12px;z-index:14;width:34px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--ink);cursor:pointer;align-items:center;justify-content:center}
+.propsShowBtn.show{display:flex}
+.propsShowBtn:hover{border-color:var(--accent-2)}
+.props.pinned{top:12px}
+.props.auto{opacity:.96}
 .props .ph{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1px solid var(--border);font:700 14px 'Inter'}
 .props .ph .pico{width:30px;height:30px;border-radius:8px;background:var(--accent);color:#241402;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .props .pbody{padding:13px 15px;max-height:62vh;overflow-y:auto}
@@ -16,7 +22,9 @@
 .prow .unit::after{content:attr(data-u);position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted);font:500 12px 'Inter';pointer-events:none}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .segbtns{display:flex;gap:6px}
+.segbtns.wrap{flex-wrap:wrap}
 .segbtns button{flex:1;background:var(--chrome);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:9px 0;font:600 12px 'Inter';cursor:pointer}
+.segbtns.wrap button{flex:1 0 44%}
 .segbtns button.sel{border-color:var(--accent);background:#3a3326;color:var(--accent)}
 .swatch{display:flex;gap:6px;flex-wrap:wrap}
 .swatch span{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent}

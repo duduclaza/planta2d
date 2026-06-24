@@ -15,4 +15,15 @@ function toWorld(sx,sy){return [(sx-panX)/scl(),(sy-panY)/scl()];}
 function snap(v){return snapOn?Math.round(v/gridStep)*gridStep:Math.round(v*100)/100;}
 function snapPoint(x,y,exclude){const thr=0.35/zoom;let best=null,bd=thr;
   for(const w of state.walls){if(exclude&&exclude.has(w.id))continue;for(const p of [[w.x1,w.y1],[w.x2,w.y2]]){const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=p;}}}
-  if(best)return{x:best[0],y:best[1]};return{x:snap(x),y:snap(y)};}
+  if(best)return{x:best[0],y:best[1],magnet:true};
+  if(typeof pseg==='function'){
+    let wallHit=null,wallDist=Math.max(0.16,0.22/zoom);
+    for(const w of state.walls){
+      if(exclude&&exclude.has(w.id))continue;
+      const p=pseg(x,y,w.x1,w.y1,w.x2,w.y2);
+      if(p.d<wallDist&&p.t>0.04&&p.t<0.96){wallDist=p.d;wallHit={x:p.x,y:p.y,wallId:w.id,t:p.t,magnet:true};}
+    }
+    if(wallHit)return wallHit;
+  }
+  return{x:snap(x),y:snap(y)};}
+function gridPoint(x,y){return{x:snap(x),y:snap(y)};}

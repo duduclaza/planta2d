@@ -16,19 +16,80 @@
 <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
+<div class="authScreen show" id="authScreen">
+  <section class="authCard">
+    <div class="authBrand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e08a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/></svg>
+      <div>
+        <b>Planta Baixa</b>
+        <span>Acesse sua conta para ver seus projetos.</span>
+      </div>
+    </div>
+    <div class="authTabs">
+      <button class="authTab active" data-mode="login">Entrar</button>
+      <button class="authTab" data-mode="register">Criar conta</button>
+    </div>
+    <div class="authMsg" id="authMsg"></div>
+
+    <form class="authForm active" id="loginForm" data-mode="login">
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Senha<span class="passwordWrap"><input name="password" type="password" autocomplete="current-password" required><button class="passEye" type="button" aria-label="Mostrar senha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+      <button class="hbtn primary" type="submit">Entrar</button>
+      <button class="authLink" type="button" onclick="setAuthMode('forgot')">Esqueci minha senha</button>
+      <button class="authLink" type="button" onclick="setAuthMode('verify')">Confirmar cadastro</button>
+    </form>
+
+    <form class="authForm" id="registerForm" data-mode="register">
+      <label>Nome<input name="name" autocomplete="name" maxlength="80" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Senha<span class="passwordWrap"><input name="password" type="password" autocomplete="new-password" minlength="8" required><button class="passEye" type="button" aria-label="Mostrar senha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+      <button class="hbtn primary" type="submit">Criar conta</button>
+    </form>
+
+    <form class="authForm" id="verifyForm" data-mode="verify">
+      <label>Email<input id="verifyEmail" name="email" type="email" autocomplete="email" required></label>
+      <label>Codigo de confirmacao<input name="code" inputmode="numeric" maxlength="6" required></label>
+      <button class="hbtn primary" type="submit">Confirmar e entrar</button>
+      <button class="authLink" id="btnResendCode" type="button">Reenviar codigo</button>
+      <button class="authLink" type="button" onclick="setAuthMode('login')">Voltar para login</button>
+    </form>
+
+    <form class="authForm" id="forgotForm" data-mode="forgot">
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <button class="hbtn primary" type="submit">Enviar codigo</button>
+      <button class="authLink" type="button" onclick="setAuthMode('login')">Voltar para login</button>
+    </form>
+
+    <form class="authForm" id="resetForm" data-mode="reset">
+      <label>Email<input id="resetEmail" name="email" type="email" autocomplete="email" required></label>
+      <label>Codigo recebido<input name="code" inputmode="numeric" maxlength="6" required></label>
+      <label>Nova senha<span class="passwordWrap"><input name="password" type="password" autocomplete="new-password" minlength="8" required><button class="passEye" type="button" aria-label="Mostrar senha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+      <button class="hbtn primary" type="submit">Alterar senha</button>
+    </form>
+  </section>
+</div>
 <div class="app">
   <header>
     <div class="brand">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e08a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/></svg>
-      Planta Baixa <span class="sub">Editor 2D</span>
+      Planta Baixa
+      <div class="fileMenu brandFile">
+        <button class="hbtn" id="btnFile">Arquivo ▾</button>
+        <div class="fileDrop" id="fileDrop">
+          <button id="btnNew">Novo</button>
+          <button id="btnDashboard">Meus projetos</button>
+          <button id="btnOpen">Abrir</button>
+          <button id="btnSave">Salvar</button>
+          <button id="btnPng">Exportar PNG</button>
+          <button id="btnPrint">Imprimir</button>
+        </div>
+      </div>
+      <button class="hbtn" id="btnAdminManagement" style="display:none">Gerenciamento</button>
     </div>
     <input id="projName" value="Projeto sem título" spellcheck="false">
     <div class="spacer"></div>
-    <button class="hbtn" id="btnNew"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Novo</button>
-    <button class="hbtn" id="btnOpen"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H3z"/></svg>Abrir</button>
-    <button class="hbtn" id="btnSave"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Salvar</button>
-    <button class="hbtn" id="btnPng"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>PNG</button>
-    <button class="hbtn primary" id="btnPrint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>Imprimir</button>
+    <span class="accountEmail" id="accountEmail"></span>
+    <button class="hbtn" id="btnLogout" style="display:none">Sair</button>
     <input type="file" id="fileInput" accept=".json,application/json">
   </header>
 
@@ -51,19 +112,59 @@
       <button class="collapseBtn" id="collapseBtn" title="Mostrar/ocultar biblioteca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
 
       <div class="props" id="props"></div>
+      <button class="propsShowBtn" id="propsShowBtn" title="Mostrar painel de propriedades"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M1 12h4M19 12h4M4.2 19.8l2.8-2.8M17 7l2.8-2.8"/></svg></button>
       <div class="ctxmenu" id="ctxMenu"></div>
+      <section class="projectsView" id="projectsView">
+        <div class="projectsHead">
+          <div>
+            <h2>Meus projetos</h2>
+            <p>Projetos salvos na sua conta.</p>
+          </div>
+          <button class="hbtn" id="projectsClose">Voltar ao editor</button>
+        </div>
+        <div class="projectsList" id="projectsList"></div>
+      </section>
+      <section class="adminView" id="adminView">
+        <div class="projectsHead">
+          <div>
+            <h2>Gerenciamento</h2>
+            <p>Clientes cadastrados, projetos, gastos e liberacao de exportacao.</p>
+          </div>
+          <button class="hbtn" id="adminClose">Voltar ao editor</button>
+        </div>
+        <div class="adminSummary" id="adminSummary"></div>
+        <section class="adminStyledAssets" id="adminStyledAssets"></section>
+        <div class="adminTableWrap">
+          <table class="adminTable">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Projetos</th>
+                <th>Gasto</th>
+                <th>Exportacoes pagas</th>
+                <th>Baixa sem pagar</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersList"></tbody>
+          </table>
+        </div>
+      </section>
 
       <div class="welcome" id="welcome">
         <div class="card">
           <h2>Bem-vindo 👋</h2>
-          <p>Editor de planta baixa 2D no estilo Planner: desenhe paredes com a espessura que quiser, encaixe portas e janelas, delimite cômodos e monte a mobília por ambiente.</p>
+          <p>Escolha se quer criar um projeto novo ou abrir um projeto existente salvo na sua conta.</p>
           <ul>
             <li>Na aba <b>Construção</b>, escolha a espessura e desenhe a <b>Parede</b> (clique em cada canto · Enter finaliza).</li>
             <li>Selecione qualquer item e ajuste as <b>medidas numéricas</b> no painel da direita.</li>
             <li>Na aba <b>Móveis</b>, escolha por cômodo e clique pra soltar no desenho.</li>
             <li>Roda = zoom · botão do meio (ou Espaço) = mover · Delete apaga.</li>
           </ul>
-          <button class="hbtn primary" id="startBtn" style="width:100%;justify-content:center">Começar a desenhar</button>
+          <label class="welcomeCheck"><input type="checkbox" id="hideWelcomeChk"> Não mostrar dicas novamente</label>
+          <div class="welcomeActions">
+            <button class="hbtn primary" id="startBtn">Novo projeto</button>
+            <button class="hbtn" id="openExistingBtn">Abrir existente</button>
+          </div>
         </div>
       </div>
     </div>
@@ -72,6 +173,7 @@
   <div class="status">
     <span id="coord">0,00 m · 0,00 m</span>
     <label class="toggle"><input type="checkbox" id="snapChk" checked> Encaixe (0,25 m)</label>
+    <label class="toggle"><input type="checkbox" id="measureChk" checked> Medidas</label>
     <span class="hint" id="hint"></span>
     <span class="grow"></span>
     <span id="counts"></span>
@@ -83,6 +185,7 @@
 </div>
 
 <script src="js/state.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/catalogs.js"></script>
 <script src="js/canvas.js"></script>
 <script src="js/floor-detection.js"></script>

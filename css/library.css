@@ -14,8 +14,43 @@
 .libitem canvas.libicon{display:block;margin:0 auto 2px;border-radius:6px}
 .libitem .nm{font:600 12.5px 'Inter';margin-top:4px;line-height:1.25}
 .libitem .dm{font:500 10.5px var(--mono);color:var(--muted);margin-top:2px}
+.roomgrp{border-bottom:1px solid var(--border);padding:0 0 8px;margin-bottom:2px}
+.roomhead{width:100%;height:38px;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;color:var(--ink);font:700 12px 'Inter';text-transform:uppercase;letter-spacing:.05em;cursor:pointer;padding:0 4px}
+.roomhead::before{content:"›";display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;margin-right:4px;color:var(--accent);font-size:18px;transition:.12s}
+.roomhead span{flex:1;text-align:left}
+.roomhead b{font:700 10px var(--mono);color:var(--muted);background:var(--chrome);border:1px solid var(--border);border-radius:999px;padding:2px 6px}
+.roomgrp.open .roomhead::before{transform:rotate(90deg)}
+.roomgrp .furnigrid{display:none}
+.roomgrp.open .furnigrid{display:grid}
+.furnigrid{gap:8px}
+.furnTheme{position:sticky;top:-10px;z-index:3;background:var(--surface);border-bottom:1px solid var(--border);padding:0 0 10px;margin:-10px -10px 8px}
+.furnTheme .secttl{padding:10px 14px 7px}
+.themeSeg{display:grid;grid-template-columns:1fr 1.25fr 1.45fr;gap:5px;padding:0 10px}
+.themeSeg button{height:34px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font:700 11px 'Inter';cursor:pointer}
+.themeSeg button.active{background:#fff2df;border-color:var(--accent);color:#26303b;box-shadow:inset 0 0 0 1px rgba(224,138,60,.35)}
+.planitem{min-height:128px;padding:8px 7px 9px;background:#f7f5ee;color:#26303b;border-color:#d9d6ca;text-align:center}
+.planitem:hover{border-color:var(--accent);background:#fffaf1}
+.planitem.sel{border-color:var(--accent);background:#fff2df;box-shadow:inset 0 0 0 1px var(--accent)}
+.planitem canvas.libicon{width:76px!important;height:76px!important;margin:0 auto 4px;background:#fbfaf6;border:1px solid #dedbd0;border-radius:6px}
+.planitem .nm{min-height:31px;margin-top:3px;color:#26303b}
+.planitem .dm{color:#7b8490}
 .thickrow{display:flex;gap:6px;margin:4px 2px 2px}
 .thickrow button{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:9px 0;font:600 13px 'Inter';cursor:pointer}
 .thickrow button.sel{border-color:var(--accent);background:#3a3326;color:var(--accent)}
 .customthick{display:flex;align-items:center;gap:8px;margin:8px 2px;font:500 12px 'Inter';color:var(--muted)}
 .customthick input{width:64px;background:var(--chrome);border:1px solid var(--border);color:var(--ink);border-radius:7px;padding:7px 8px;font:600 13px var(--mono)}
+.flooritem{padding:7px;text-align:left}
+.floorswatch{height:52px;border-radius:7px;border:1px solid rgba(0,0,0,.25);margin-bottom:6px;overflow:hidden;position:relative}
+.floorswatch.ceramic{background-image:linear-gradient(90deg,rgba(70,55,35,.30) 2px,transparent 2px),linear-gradient(rgba(70,55,35,.30) 2px,transparent 2px),linear-gradient(135deg,rgba(255,255,255,.32),rgba(120,95,65,.20));background-size:26px 26px,26px 26px,100% 100%}
+.floorswatch.ceramic_large{background-image:linear-gradient(90deg,rgba(70,55,35,.28) 2px,transparent 2px),linear-gradient(rgba(70,55,35,.28) 2px,transparent 2px),radial-gradient(rgba(255,255,255,.35) 1px,transparent 2px);background-size:34px 34px,34px 34px,9px 9px}
+.floorswatch.porcelain{background-image:linear-gradient(90deg,rgba(120,130,140,.22) 1px,transparent 1px),linear-gradient(rgba(120,130,140,.22) 1px,transparent 1px),radial-gradient(ellipse at 25% 30%,rgba(255,255,255,.75),transparent 34%),linear-gradient(120deg,rgba(160,170,180,.22),transparent 45%,rgba(255,255,255,.35));background-size:32px 32px,32px 32px,100% 100%,100% 100%}
+.floorswatch.porcelain_marble{background-image:linear-gradient(90deg,rgba(120,130,140,.18) 1px,transparent 1px),linear-gradient(rgba(120,130,140,.18) 1px,transparent 1px),linear-gradient(125deg,transparent 15%,rgba(110,120,130,.20) 18%,transparent 24%,transparent 56%,rgba(95,100,105,.22) 60%,transparent 67%),radial-gradient(ellipse at 35% 28%,rgba(255,255,255,.85),transparent 38%);background-size:38px 38px,38px 38px,100% 100%,100% 100%}
+.floorswatch.cement{background-image:radial-gradient(rgba(255,255,255,.18) 1px,transparent 1px),radial-gradient(rgba(0,0,0,.16) 1px,transparent 1px),linear-gradient(135deg,rgba(255,255,255,.12),transparent 45%,rgba(0,0,0,.08));background-size:8px 8px,13px 13px,100% 100%}
+.floorswatch.external{background-image:linear-gradient(90deg,rgba(55,55,45,.30) 2px,transparent 2px),linear-gradient(rgba(55,55,45,.30) 2px,transparent 2px),radial-gradient(rgba(255,255,255,.18) 1px,transparent 1px);background-size:22px 22px,22px 22px,7px 7px}
+.floorswatch.wood{background-image:repeating-linear-gradient(90deg,rgba(70,35,15,.28) 0 2px,transparent 2px 28px),repeating-linear-gradient(8deg,rgba(255,238,200,.20) 0 3px,rgba(110,60,25,.18) 3px 7px,transparent 7px 16px),linear-gradient(90deg,rgba(90,45,18,.22),transparent 25%,rgba(255,230,180,.18) 48%,rgba(70,35,16,.18));background-size:28px 100%,100% 22px,100% 100%}
+.floorswatch.wood_herringbone{background-image:linear-gradient(45deg,rgba(70,35,15,.34) 2px,transparent 2px),linear-gradient(-45deg,rgba(70,35,15,.28) 2px,transparent 2px),linear-gradient(90deg,rgba(255,230,180,.18),rgba(80,38,14,.16));background-size:24px 24px,24px 24px,100% 100%}
+.floorswatch.laminate,.floorswatch.vinyl{background-image:repeating-linear-gradient(90deg,rgba(70,35,15,.22) 0 2px,transparent 2px 22px),repeating-linear-gradient(6deg,rgba(255,238,200,.16) 0 3px,rgba(100,55,25,.15) 3px 7px,transparent 7px 15px);background-size:22px 100%,100% 20px}
+.floorswatch.stone{background-image:linear-gradient(115deg,transparent 20%,rgba(0,0,0,.24) 21%,transparent 23%),linear-gradient(20deg,transparent 36%,rgba(255,255,255,.18) 38%,transparent 41%),radial-gradient(rgba(0,0,0,.16) 1px,transparent 2px);background-size:100% 100%,100% 100%,8px 8px}
+.floorswatch.grass{background-image:repeating-linear-gradient(105deg,rgba(18,78,26,.70) 0 2px,transparent 2px 7px),repeating-linear-gradient(75deg,rgba(205,255,170,.35) 0 1px,transparent 1px 6px),radial-gradient(rgba(8,48,18,.35) 1px,transparent 2px);background-size:12px 100%,10px 100%,7px 7px}
+.floorswatch.asphalt{background-image:linear-gradient(90deg,transparent 45%,rgba(255,205,40,.92) 46%,rgba(255,205,40,.92) 54%,transparent 55%),radial-gradient(rgba(255,255,255,.18) 1px,transparent 1px),radial-gradient(rgba(0,0,0,.38) 1px,transparent 1px),linear-gradient(135deg,rgba(255,255,255,.07),transparent 40%,rgba(0,0,0,.22));background-size:18px 34px,7px 7px,11px 11px,100% 100%;background-position:center 0,0 0,3px 5px,0 0}
+.floorswatch.sand{background-image:radial-gradient(rgba(85,60,25,.35) 1px,transparent 1px),radial-gradient(rgba(255,245,210,.45) 1px,transparent 1px),radial-gradient(rgba(130,95,45,.25) 1.5px,transparent 1.5px);background-size:8px 8px,13px 13px,19px 19px;background-position:0 0,4px 5px,8px 2px}

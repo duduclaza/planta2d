@@ -1,0 +1,258 @@
+{
+  "app": "planta-baixa",
+  "v": 2,
+  "name": "Casa Exemplo",
+  "defaultWallT": 0.15,
+  "zoom": 50,
+  "panX": 300,
+  "panY": 100,
+  "state": {
+    "walls": [
+      {
+        "id": "w1",
+        "x1": 0,
+        "y1": 0,
+        "x2": 8,
+        "y2": 0,
+        "t": 0.15
+      },
+      {
+        "id": "w2",
+        "x1": 8,
+        "y1": 0,
+        "x2": 8,
+        "y2": 6,
+        "t": 0.15
+      },
+      {
+        "id": "w3",
+        "x1": 8,
+        "y1": 6,
+        "x2": 0,
+        "y2": 6,
+        "t": 0.15
+      },
+      {
+        "id": "w4",
+        "x1": 0,
+        "y1": 6,
+        "x2": 0,
+        "y2": 0,
+        "t": 0.15
+      },
+      {
+        "id": "w5",
+        "x1": 4,
+        "y1": 0,
+        "x2": 4,
+        "y2": 6,
+        "t": 0.15
+      },
+      {
+        "id": "w6",
+        "x1": 4,
+        "y1": 4,
+        "x2": 8,
+        "y2": 4,
+        "t": 0.15
+      }
+    ],
+    "rooms": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 6,
+        "material": "madeira",
+        "color": "#e5cfa8",
+        "name": "Sala e Cozinha"
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 4,
+        "material": "carpete",
+        "color": "#d0d5d9",
+        "name": "Quarto"
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "w": 4,
+        "h": 2,
+        "material": "ceramica",
+        "color": "#f4f1e8",
+        "name": "Banheiro"
+      }
+    ],
+    "floors": [],
+    "furniture": [
+      {
+        "id": "f1",
+        "kind": "sofa",
+        "x": 2,
+        "y": 4,
+        "w": 2,
+        "h": 0.9,
+        "angle": 0
+      },
+      {
+        "id": "f2",
+        "kind": "rack",
+        "x": 2,
+        "y": 5.8,
+        "w": 1.6,
+        "h": 0.4,
+        "angle": 3.141592653589793
+      },
+      {
+        "id": "f3",
+        "kind": "mesa_cozinha",
+        "x": 2,
+        "y": 1.5,
+        "w": 1,
+        "h": 0.7,
+        "angle": 0
+      },
+      {
+        "id": "f4",
+        "kind": "pia_cooktop_120",
+        "x": 0.3,
+        "y": 1.5,
+        "w": 1.2,
+        "h": 0.55,
+        "angle": 1.5707963267948966
+      },
+      {
+        "id": "f5",
+        "kind": "geladeira",
+        "x": 0.35,
+        "y": 2.5,
+        "w": 0.7,
+        "h": 0.7,
+        "angle": 1.5707963267948966
+      },
+      {
+        "id": "f6",
+        "kind": "cama_casal",
+        "x": 6,
+        "y": 1.5,
+        "w": 1.4,
+        "h": 1.9,
+        "angle": 0
+      },
+      {
+        "id": "f7",
+        "kind": "armario",
+        "x": 7.7,
+        "y": 2,
+        "w": 1.8,
+        "h": 0.6,
+        "angle": -1.5707963267948966
+      },
+      {
+        "id": "f8",
+        "kind": "vaso",
+        "x": 5,
+        "y": 5.7,
+        "w": 0.4,
+        "h": 0.6,
+        "angle": 3.141592653589793
+      },
+      {
+        "id": "f9",
+        "kind": "lavatorio",
+        "x": 6,
+        "y": 5.8,
+        "w": 0.5,
+        "h": 0.4,
+        "angle": 3.141592653589793
+      },
+      {
+        "id": "f10",
+        "kind": "chuveiro",
+        "x": 7.5,
+        "y": 5,
+        "w": 0.9,
+        "h": 0.9,
+        "angle": 0
+      }
+    ],
+    "openings": [
+      {
+        "id": "o1",
+        "wallId": "w3",
+        "x": 2,
+        "y": 6,
+        "width": 0.9,
+        "t": 0.15,
+        "angle": 0,
+        "type": "door",
+        "subtype": "giro",
+        "hinge": -1,
+        "flip": 1
+      },
+      {
+        "id": "o2",
+        "wallId": "w5",
+        "x": 4,
+        "y": 1,
+        "width": 0.8,
+        "t": 0.15,
+        "angle": 1.5707963267948966,
+        "type": "door",
+        "subtype": "giro",
+        "hinge": -1,
+        "flip": -1
+      },
+      {
+        "id": "o3",
+        "wallId": "w6",
+        "x": 5,
+        "y": 4,
+        "width": 0.7,
+        "t": 0.15,
+        "angle": 0,
+        "type": "door",
+        "subtype": "giro",
+        "hinge": 1,
+        "flip": 1
+      },
+      {
+        "id": "o4",
+        "wallId": "w4",
+        "x": 0,
+        "y": 3,
+        "width": 1.5,
+        "t": 0.15,
+        "angle": 1.5707963267948966,
+        "type": "window",
+        "subtype": ""
+      },
+      {
+        "id": "o5",
+        "wallId": "w2",
+        "x": 8,
+        "y": 2,
+        "width": 1.5,
+        "t": 0.15,
+        "angle": 1.5707963267948966,
+        "type": "window",
+        "subtype": ""
+      },
+      {
+        "id": "o6",
+        "wallId": "w2",
+        "x": 8,
+        "y": 5,
+        "width": 0.6,
+        "t": 0.15,
+        "angle": 1.5707963267948966,
+        "type": "window",
+        "subtype": ""
+      }
+    ],
+    "texts": []
+  }
+}

@@ -1,8 +1,14 @@
 "use strict";
 //==================== STATUS / ZOOM ====================
-function afterChange(){document.getElementById('counts').textContent=`${state.walls.length} paredes · ${state.rooms.length} cômodos · ${state.openings.length} portas/janelas · ${state.furniture.length} móveis`;}
+function afterChange(){
+  document.getElementById('counts').textContent=`${state.walls.length} paredes · ${state.rooms.length} cômodos · ${state.openings.length} portas/janelas · ${state.furniture.length} móveis · ${(state.measures||[]).length} medidas`;
+  if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+}
 function updateZoom(){document.getElementById('zoomLbl').textContent=Math.round(zoom*100)+'%';}
-document.getElementById('snapChk').onchange=e=>{snapOn=e.target.checked;};
+const snapChk=document.getElementById('snapChk');
+if(snapChk){snapChk.checked=snapOn;snapChk.onchange=e=>{snapOn=e.target.checked;localStorage.setItem('planta2d:snapOn',snapOn?'1':'0');};}
+const measureChk=document.getElementById('measureChk');
+if(measureChk){measureChk.checked=showMeasures;measureChk.onchange=e=>{showMeasures=e.target.checked;localStorage.setItem('planta2d:showMeasures',showMeasures?'1':'0');draw();renderProps();};}
 document.getElementById('zoomIn').onclick=()=>zoomAt(1.2);document.getElementById('zoomOut').onclick=()=>zoomAt(1/1.2);
 function zoomAt(f){const cx=W/2,cy=H/2,[wx,wy]=toWorld(cx,cy);zoom=Math.max(0.15,Math.min(8,zoom*f));panX=cx-wx*scl();panY=cy-wy*scl();updateZoom();draw();}
 document.getElementById('zoomFit').onclick=fitView;
