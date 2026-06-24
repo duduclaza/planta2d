@@ -580,9 +580,11 @@ document.getElementById('btnPrint').onclick=()=>{const url=renderExport(2.2);con
 function bounds(){let mnx=Infinity,mny=Infinity,mxx=-Infinity,mxy=-Infinity,any=false;const ext=(x,y)=>{any=true;mnx=Math.min(mnx,x);mny=Math.min(mny,y);mxx=Math.max(mxx,x);mxy=Math.max(mxy,y);};
   state.walls.forEach(w=>{ext(w.x1,w.y1);ext(w.x2,w.y2);});state.rooms.forEach(r=>{ext(r.x,r.y);ext(r.x+r.w,r.y+r.h);});(state.floors||[]).forEach(f=>{ext(f.x,f.y);ext(f.x+f.w,f.y+f.h);});state.furniture.forEach(f=>{ext(f.x-f.w/2,f.y-f.h/2);ext(f.x+f.w/2,f.y+f.h/2);});state.texts.forEach(t=>ext(t.x,t.y));state.openings.forEach(o=>ext(o.x,o.y));(state.measures||[]).forEach(m=>{ext(m.x1,m.y1);ext(m.x2,m.y2);});
   if(!any)return null;return{mnx,mny,mxx,mxy};}
-function renderExport(q){const b=bounds(),pad=1,tmp=document.createElement('canvas');
-  const bw=(b?(b.mxx-b.mnx):8)+pad*2,bh=(b?(b.mxy-b.mny):6)+pad*2,px=Math.min(2800,Math.max(900,bw*PPM*q)),scale=px/(bw*PPM);
-  tmp.width=bw*PPM*scale;tmp.height=bh*PPM*scale;const x=tmp.getContext('2d'),E=PPM*scale,ox=(-(b?b.mnx:0)+pad)*E,oy=(-(b?b.mny:0)+pad)*E,T=(a,b2)=>[a*E+ox,b2*E+oy];
+function renderExport(q){const b=bounds(),pad=1,bw=(b?(b.mxx-b.mnx):8)+pad*2,px=Math.min(2800,Math.max(900,bw*PPM*q)),scale=px/(bw*PPM);
+  return renderExportCanvas(PPM*scale,pad).toDataURL('image/png');}
+function renderExportCanvas(E,pad){const b=bounds(),tmp=document.createElement('canvas');
+  const bw=(b?(b.mxx-b.mnx):8)+pad*2,bh=(b?(b.mxy-b.mny):6)+pad*2;
+  tmp.width=Math.round(bw*E);tmp.height=Math.round(bh*E);const x=tmp.getContext('2d'),ox=(-(b?b.mnx:0)+pad)*E,oy=(-(b?b.mny:0)+pad)*E,T=(a,b2)=>[a*E+ox,b2*E+oy];
   x.fillStyle='#fff';x.fillRect(0,0,tmp.width,tmp.height);
   computeFloors().forEach(poly=>{x.fillStyle='#d9dbd5';x.beginPath();poly.forEach((p,i)=>{const[a,b2]=T(p.x,p.y);i?x.lineTo(a,b2):x.moveTo(a,b2);});x.closePath();x.fill();});
   (state.floors||[]).forEach(f=>{const[a,b2]=T(f.x,f.y),w=f.w*E,h=f.h*E,mat=materialInfo(f.material),tile=f.tileSize||mat[3]||0.6;x.beginPath();x.rect(a,b2,w,h);fillCurrentPathWithMaterial(x,f.material,f.color||mat[2],0.82,{patternPx:tile*E});x.strokeStyle=hexA('#2a2f37',0.28);x.lineWidth=1.2;x.strokeRect(a,b2,w,h);});
@@ -594,4 +596,24 @@ function renderExport(q){const b=bounds(),pad=1,tmp=document.createElement('canv
   if(showMeasures)state.walls.forEach(w=>{if(w.measureHidden)return;const len=Math.hypot(w.x2-w.x1,w.y2-w.y1);if(len<0.05)return;const mx=(w.x1+w.x2)/2,my=(w.y1+w.y2)/2,ang=Math.atan2(w.y2-w.y1,w.x2-w.x1),off=(w.measureOffset??((w.t||defaultWallT)/2+0.18)),[lx,ly]=T(mx+Math.sin(ang)*off,my-Math.cos(ang)*off);x.font="600 11px monospace";x.fillStyle='#2a2f37';x.textAlign='center';x.textBaseline='middle';x.fillText(fmt(len),lx,ly);});
   state.texts.forEach(t=>{x.font=`600 ${t.size||14}px Inter`;const tw=x.measureText(t.text).width,th=t.size||14,[cx,cy]=T(t.x+tw/E/2,t.y+th/E/2);x.save();x.translate(cx,cy);x.rotate(t.angle||0);x.fillStyle='#2a2f37';x.textAlign='center';x.textBaseline='middle';x.fillText(t.text,0,0);x.restore();});
   x.font="700 16px Inter";x.fillStyle='#1d2530';x.textAlign='left';x.textBaseline='top';x.fillText(document.getElementById('projName').value||'Planta baixa',12,12);
-  return tmp.toDataURL('image/png');}
+  return tmp;}
+
+function pdfScaleFactor(scaleDenom,dpi){return (1000/scaleDenom)*(dpi/25.4);}
+function exportPdf(scaleDenom){
+  if(typeof window.jspdf==='undefined'||!window.jspdf.jsPDF){alert('A biblioteca de PDF ainda está carregando. Tente de novo em um instante.');return;}
+  const dpi=300,pad=1,E=pdfScaleFactor(scaleDenom,dpi),canvas=renderExportCanvas(E,pad);
+  if(canvas.width>14000||canvas.height>14000){alert('A planta é grande demais para essa escala nessa resolução. Tente a escala 1:100 ou reduza a área desenhada.');return;}
+  const wMm=canvas.width/dpi*25.4,hMm=canvas.height/dpi*25.4,marginMm=10,titleH=14;
+  const pageW=wMm+marginMm*2,pageH=hMm+marginMm*2+titleH;
+  const{jsPDF}=window.jspdf,doc=new jsPDF({orientation:pageW>=pageH?'l':'p',unit:'mm',format:[pageW,pageH]});
+  doc.addImage(canvas.toDataURL('image/png'),'PNG',marginMm,marginMm,wMm,hMm);
+  const name=document.getElementById('projName').value||'Planta baixa';
+  doc.setFontSize(11);doc.setTextColor(40,47,55);
+  doc.text(`${name}  ·  Escala 1:${scaleDenom}  ·  ${dpi} DPI`,marginMm,pageH-titleH/2+2);
+  doc.save(name.replace(/\s+/g,'_')+`_1-${scaleDenom}.pdf`);
+}
+let pdfExportScale=50;
+document.getElementById('btnPdf').onclick=()=>{document.getElementById('pdfModal').style.display='flex';};
+document.getElementById('pdfCancelBtn').onclick=()=>{document.getElementById('pdfModal').style.display='none';};
+document.querySelectorAll('#pdfScaleBtns button').forEach(b=>b.onclick=()=>{pdfExportScale=+b.dataset.v;document.querySelectorAll('#pdfScaleBtns button').forEach(x=>x.classList.toggle('sel',x===b));});
+document.getElementById('pdfGenerateBtn').onclick=()=>{document.getElementById('pdfModal').style.display='none';exportPdf(pdfExportScale);};

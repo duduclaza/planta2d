@@ -81,6 +81,7 @@
           <button id="btnOpen">Abrir</button>
           <button id="btnSave">Salvar</button>
           <button id="btnPng">Exportar PNG</button>
+          <button id="btnPdf">Exportar PDF</button>
           <button id="btnPrint">Imprimir</button>
         </div>
       </div>
@@ -167,6 +168,21 @@
           </div>
         </div>
       </div>
+
+      <div class="welcome" id="pdfModal" style="display:none">
+        <div class="card">
+          <h2>Exportar PDF</h2>
+          <p>Escolha a escala de impressão. O PDF sai em 300 DPI, no tamanho de papel exato pra essa escala.</p>
+          <div class="prow"><label>Escala</label><div class="segbtns" id="pdfScaleBtns">
+            <button type="button" data-v="50" class="sel">1:50</button>
+            <button type="button" data-v="100">1:100</button>
+          </div></div>
+          <div class="welcomeActions">
+            <button class="hbtn primary" id="pdfGenerateBtn">Gerar PDF</button>
+            <button class="hbtn" id="pdfCancelBtn">Cancelar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -184,6 +200,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/state.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/catalogs.js"></script>
