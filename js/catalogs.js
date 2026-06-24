@@ -61,12 +61,14 @@ const FURNI = [
     ['varal','Varal de roupa',1.4,0.7],['tanquinho','Tanquinho',0.45,0.45],
   ]],
   ['Área externa / Garagem',[
-    ['carro','Carro',1.8,4.5],['carro_pequeno','Carro pequeno',1.6,3.8],['carro_suv','SUV / Caminhonete',1.9,5.0],
-    ['moto','Moto',0.8,2.1],['bicicleta','Bicicleta',0.6,1.7],
     ['espreguicadeira','Espreguiçadeira',0.75,1.9],['ombrelone','Ombrelone',1.8,1.8],
     ['planta','Vaso de planta',0.5,0.5],['arvore','Árvore Grande',1.5,1.5],['mesa_ext','Mesa externa',1.2,1.2],
     ['banco_jardim','Banco jardim',1.5,0.55],['sofa_ext','Sofá de Exterior',1.8,0.8],
     ['churrasqueira_gourmet','Churrasqueira Gourmet',1.6,0.7]
+  ]],
+  ['Veículos',[
+    ['carro','Carro',1.8,4.5],['carro_pequeno','Carro pequeno',1.6,3.8],['carro_suv','SUV / Caminhonete',1.9,5.0],
+    ['moto','Moto',0.8,2.1],['bicicleta','Bicicleta',0.6,1.7]
   ]],
   ['Lazer / Academia',[
     ['mesa_sinuca','Mesa de Sinuca',2.3,1.3],['esteira','Esteira',1.8,0.8],['bicicleta_ergometrica','Bicicleta Ergom.',1.2,0.6],
@@ -92,7 +94,8 @@ function categoryImageFolders(category){
   if(slug.includes('lavanderia'))return ['lavanderia'];
   if(slug.includes('escrit'))return ['escritorio'];
   if(slug.includes('lazer')||slug.includes('academia'))return ['lazeracademia'];
-  if(slug.includes('externa')&&slug.includes('garagem'))return ['areaexternagaragem','areaexterna','veiculos'];
+  if(slug.includes('veiculo'))return ['veiculos'];
+  if(slug.includes('externa')&&slug.includes('garagem'))return ['areaexternagaragem','areaexterna'];
   if(slug.includes('externa'))return ['areaexterna'];
   return ['geral'];
 }
