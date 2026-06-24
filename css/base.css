@@ -41,6 +41,12 @@ header{display:flex;align-items:center;gap:12px;padding:0 14px;height:54px;backg
 .zoombtns{display:flex;gap:4px;align-items:center}
 .zoombtns button{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;font-size:15px;line-height:1;padding:0}
 .zoombtns button:hover{border-color:var(--accent-2)}
+.iconBtn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.iconBtn:hover{border-color:var(--accent-2)}
+.iconBtn.off{color:var(--muted);opacity:.5}
+.bgSwatches{display:flex;gap:5px;align-items:center}
+.bgSwatches span{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;box-shadow:inset 0 0 0 1px var(--border)}
+.bgSwatches span.sel{border-color:var(--accent)}
 
 input[type=file]{display:none}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}

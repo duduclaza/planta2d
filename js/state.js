@@ -3,6 +3,17 @@
 const PPM = 40;
 let zoom = 1, panX = 0, panY = 0;
 let snapOn = localStorage.getItem('planta2d:snapOn')!=='0', gridStep = 0.25;
+let guidesOn = localStorage.getItem('planta2d:guidesOn')!=='0';
+let gridOn = localStorage.getItem('planta2d:gridOn')!=='0';
+let canvasBg = localStorage.getItem('planta2d:canvasBg')||'white';
+let alignGuides = [];
+const CANVAS_BG_THEMES = {
+  white:{bg:'#fbfaf6',swatch:'#ffffff',dark:false},
+  darkgray:{bg:'#2e2e2e',swatch:'#3a3a3a',dark:true},
+  black:{bg:'#0b0b0b',swatch:'#000000',dark:true},
+  darkgreen:{bg:'#0f2419',swatch:'#11331f',dark:true},
+  darkblue:{bg:'#0c1b2e',swatch:'#0e2238',dark:true}
+};
 let defaultWallT = 0.15;        // m
 const state = { walls:[], openings:[], rooms:[], floors:[], furniture:[], texts:[], measures:[], groups:[] };
 let furnitureTheme = localStorage.getItem('planta2d:furnitureTheme')||'clean3d';

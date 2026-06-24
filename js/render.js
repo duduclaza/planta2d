@@ -4,13 +4,28 @@ function draw(){drawGrid();drawMain();}
 function fmt(m){return m.toFixed(2).replace('.',',')+' m';}
 function fmtA(a){return a.toFixed(2).replace('.',',')+' m²';}
 
-function drawGrid(){g.clearRect(0,0,W,H);g.fillStyle='#fbfaf6';g.fillRect(0,0,W,H);
+function drawGrid(){g.clearRect(0,0,W,H);
+  const theme=CANVAS_BG_THEMES[canvasBg]||CANVAS_BG_THEMES.white;
+  g.fillStyle=theme.bg;g.fillRect(0,0,W,H);
+  if(!gridOn)return;
   const [wx0,wy0]=toWorld(0,0),[wx1,wy1]=toWorld(W,H),minor=0.5;
+  const minorC=theme.dark?'rgba(255,255,255,.07)':'#e7e9e4',majorC=theme.dark?'rgba(255,255,255,.16)':'#d2d6cf';
   g.lineWidth=1;
-  for(let x=Math.floor(wx0/minor)*minor;x<=wx1;x+=minor){const [sx]=toScreen(x,0);const mj=Math.abs(x%1)<1e-6;g.strokeStyle=mj?'#d2d6cf':'#e7e9e4';g.beginPath();g.moveTo(sx,0);g.lineTo(sx,H);g.stroke();}
-  for(let y=Math.floor(wy0/minor)*minor;y<=wy1;y+=minor){const [,sy]=toScreen(0,y);const mj=Math.abs(y%1)<1e-6;g.strokeStyle=mj?'#d2d6cf':'#e7e9e4';g.beginPath();g.moveTo(0,sy);g.lineTo(W,sy);g.stroke();}
-  const [ox,oy]=toScreen(0,0);g.strokeStyle='#c2b6a3';g.lineWidth=1.5;g.beginPath();g.moveTo(ox,0);g.lineTo(ox,H);g.moveTo(0,oy);g.lineTo(W,oy);g.stroke();}
+  for(let x=Math.floor(wx0/minor)*minor;x<=wx1;x+=minor){const [sx]=toScreen(x,0);const mj=Math.abs(x%1)<1e-6;g.strokeStyle=mj?majorC:minorC;g.beginPath();g.moveTo(sx,0);g.lineTo(sx,H);g.stroke();}
+  for(let y=Math.floor(wy0/minor)*minor;y<=wy1;y+=minor){const [,sy]=toScreen(0,y);const mj=Math.abs(y%1)<1e-6;g.strokeStyle=mj?majorC:minorC;g.beginPath();g.moveTo(0,sy);g.lineTo(W,sy);g.stroke();}
+  const [ox,oy]=toScreen(0,0);g.strokeStyle=theme.dark?'rgba(255,255,255,.25)':'#c2b6a3';g.lineWidth=1.5;g.beginPath();g.moveTo(ox,0);g.lineTo(ox,H);g.moveTo(0,oy);g.lineTo(W,oy);g.stroke();}
 
+function drawAlignGuides(){
+  if(!alignGuides||!alignGuides.length)return;
+  c.save();c.lineWidth=1;c.setLineDash([5,4]);
+  alignGuides.forEach(gl=>{
+    c.strokeStyle=gl.color;c.beginPath();
+    if(gl.axis==='x'){const [sx]=toScreen(gl.value,0);c.moveTo(sx,0);c.lineTo(sx,H);}
+    else{const [,sy]=toScreen(0,gl.value);c.moveTo(0,sy);c.lineTo(W,sy);}
+    c.stroke();
+  });
+  c.restore();
+}
 function drawMain(){c.clearRect(0,0,W,H);
   for(const poly of computeFloors())drawFloor(poly);
   for(const f of (state.floors||[]))drawFloorArea(f);
@@ -22,6 +37,7 @@ function drawMain(){c.clearRect(0,0,W,H);
   for(const m of (state.measures||[]))drawSavedMeasure(m);
   if(showMeasures)for(const w of state.walls)drawWallLabel(w);
   if(multiSel&&multiSel.length>1)drawMultiSelection();else if(sel)drawSelection();
+  drawAlignGuides();
   if(tool==='wall'&&wallChain.length){const sc=scl();c.strokeStyle='#e08a3c';c.lineWidth=Math.max(defaultWallT*sc,3);c.lineCap='round';c.lineJoin='round';
     c.beginPath();const [px,py]=toScreen(wallChain[0].x,wallChain[0].y);c.moveTo(px,py);
     for(let i=1;i<wallChain.length;i++){const[x,y]=toScreen(wallChain[i].x,wallChain[i].y);c.lineTo(x,y);}
