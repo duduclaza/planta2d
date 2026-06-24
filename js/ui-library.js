@@ -170,10 +170,10 @@ function buildCustomLibraryHtml(){
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         <div class="nm">Adicionar imagem</div>
       </div>
-      ${customFurniture.map(it=>`<div class="libitem planitem customItem" data-custom="${it.kind}">
+      ${customFurniture.map(it=>`<div class="libitem planitem customItem" data-custom="${it.kind}" title="Clique direito pra editar nome/tamanho">
         <button class="customDel" data-del="${it.kind}" title="Remover">×</button>
         <canvas class="libicon"></canvas>
-        <div class="nm">${it.label}</div><div class="dm">${it.w.toFixed(2).replace('.',',')}×${it.h.toFixed(2).replace('.',',')} m</div>
+        <div class="nm">${it.label}</div><div class="dm">${Math.round(it.w*100)}×${Math.round(it.h*100)} cm</div>
       </div>`).join('')}
     </div>
   </div>`;
@@ -186,11 +186,15 @@ function bindCustomLibrary(){
       const file=inp.files&&inp.files[0];if(!file)return;
       const reader=new FileReader();
       reader.onload=()=>{
-        const name=(prompt('Nome do item:','Meu móvel')||'').trim()||'Meu móvel';
-        const w=Math.max(0.05,parseFloat((prompt('Largura (m):','0,60')||'0,6').replace(',','.'))||0.6);
-        const h=Math.max(0.05,parseFloat((prompt('Profundidade (m):','0,60')||'0,6').replace(',','.'))||0.6);
-        addCustomFurnitureItem(name,w,h,reader.result);
-        buildFurni();
+        const dataUrl=reader.result;
+        getFurnitureImage(dataUrl,()=>{
+          if(!_imgCache[dataUrl]||!_imgCache[dataUrl].loaded){alert('Não foi possível carregar essa imagem.');return;}
+          const name=(prompt('Nome do item:','Meu móvel')||'').trim()||'Meu móvel';
+          const wCm=Math.max(5,parseFloat((prompt('Largura (cm):','60')||'60').replace(',','.'))||60);
+          const hCm=Math.max(5,parseFloat((prompt('Profundidade (cm):','60')||'60').replace(',','.'))||60);
+          addCustomFurnitureItem(name,wCm/100,hCm/100,dataUrl);
+          buildFurni();
+        });
       };
       reader.readAsDataURL(file);
     };
@@ -204,6 +208,15 @@ function bindCustomLibrary(){
       pendingFurniture=[it.kind,it.label,it.w,it.h];setTool('furniture');
       document.querySelectorAll('#libFurni .libitem').forEach(x=>x.classList.toggle('sel',x===d));
       setHint('Clique no desenho pra soltar: '+it.label);
+    };
+    d.oncontextmenu=(e)=>{
+      e.preventDefault();
+      const name=(prompt('Nome do item:',it.label)||'').trim()||it.label;
+      const wCm=Math.max(5,parseFloat((prompt('Largura (cm):',Math.round(it.w*100))||'').replace(',','.'))||Math.round(it.w*100));
+      const hCm=Math.max(5,parseFloat((prompt('Profundidade (cm):',Math.round(it.h*100))||'').replace(',','.'))||Math.round(it.h*100));
+      it.label=name;it.w=wCm/100;it.h=hCm/100;
+      saveCustomFurniture();
+      buildFurni();
     };
   });
   document.querySelectorAll('#libFurni .customDel').forEach(b=>{

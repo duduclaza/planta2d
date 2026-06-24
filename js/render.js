@@ -825,7 +825,12 @@ function drawSelectionRef(s){const sc=scl();if(!s)return;
   if(s.kind==='wall'){const w=state.walls.find(o=>o.id===s.id);if(!w)return;[[w.x1,w.y1],[w.x2,w.y2]].forEach(p=>handle(...toScreen(p[0],p[1])));if(activeWallPoint&&pseg(activeWallPoint.x,activeWallPoint.y,w.x1,w.y1,w.x2,w.y2).d<0.001)handle(...toScreen(activeWallPoint.x,activeWallPoint.y));}
   else if(s.kind==='room'){const r=state.rooms.find(o=>o.id===s.id);if(!r)return;const[x,y]=toScreen(r.x,r.y),w=r.w*sc,h=r.h*sc;c.strokeStyle=r.locked?'#d9544f':'#e08a3c';c.lineWidth=2;c.strokeRect(x,y,w,h);if(!r.locked)[[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(p=>handle(p[0],p[1]));}
   else if(s.kind==='floor'){const f=(state.floors||[]).find(o=>o.id===s.id);if(!f)return;const[x,y]=toScreen(f.x,f.y),w=f.w*sc,h=f.h*sc;c.strokeStyle=f.locked?'#d9544f':'#e08a3c';c.lineWidth=2;c.strokeRect(x,y,w,h);if(!f.locked)[[x,y],[x+w,y],[x,y+h],[x+w,y+h]].forEach(p=>handle(p[0],p[1]));}
-  else if(s.kind==='furniture'){const f=state.furniture.find(o=>o.id===s.id);if(!f)return;const[cx,cy]=toScreen(f.x,f.y);c.save();c.translate(cx,cy);c.rotate(f.angle||0);const w=f.w*sc,h=f.h*sc;c.strokeStyle='#e08a3c';c.lineWidth=2;c.strokeRect(-w/2,-h/2,w,h);c.beginPath();c.moveTo(0,-h/2);c.lineTo(0,-h/2-22);c.stroke();c.restore();const ra=rotPos(f);c.fillStyle='#e08a3c';c.beginPath();c.arc(ra[0],ra[1],6,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();}
+  else if(s.kind==='furniture'){const f=state.furniture.find(o=>o.id===s.id);if(!f)return;const[cx,cy]=toScreen(f.x,f.y);c.save();c.translate(cx,cy);c.rotate(f.angle||0);const w=f.w*sc,h=f.h*sc;c.strokeStyle='#e08a3c';c.lineWidth=2;c.strokeRect(-w/2,-h/2,w,h);c.beginPath();c.moveTo(0,-h/2);c.lineTo(0,-h/2-22);c.stroke();c.restore();
+    if(!f.locked){
+      const ra=rotPos(f);c.fillStyle='#e08a3c';c.beginPath();c.arc(ra[0],ra[1],6,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();
+      const a=f.angle||0,cosA=Math.cos(a),sinA=Math.sin(a);
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sy])=>{const lx=sx*w/2,ly=sy*h/2;handle(cx+lx*cosA-ly*sinA,cy+lx*sinA+ly*cosA);});
+    }}
   else if(s.kind==='opening'){const o=state.openings.find(x=>x.id===s.id);if(!o)return;const dx=Math.cos(o.angle),dy=Math.sin(o.angle);[-1,1].forEach(sg=>handle(...toScreen(o.x+sg*dx*o.width/2,o.y+sg*dy*o.width/2)));}
   else if(s.kind==='measure'){const m=(state.measures||[]).find(o=>o.id===s.id);if(!m)return;handle(...toScreen(m.x1,m.y1));handle(...toScreen(m.x2,m.y2));}
   else if(s.kind==='group'){const g=(state.groups||[]).find(o=>o.id===s.id);if(g)(g.items||[]).forEach(r=>drawSelectionRef(r));}
