@@ -137,7 +137,7 @@ registerStyledFurnitureImages(CONSTR_ITEMS.map(([category,items])=>[category,ite
     ])
   ];
 });
-FURNITURE_IMAGES['carro']=[...(FURNITURE_IMAGES['carro']||[]),...FURNITURE_IMAGE_BASES.map(base=>`${base}/Veiculos/carr.png`)];
+FURNITURE_IMAGES['carro']=[...FURNITURE_IMAGE_BASES.map(base=>`${base}/Veiculos/carr.png`),...(FURNITURE_IMAGES['carro']||[])];
 
 const TOOLS = [
   ['select','Selecionar / mover','V','<path d="M4 3l7 17 2.5-7L21 11z"/>'],
