@@ -7,7 +7,13 @@ const CUSTOM_FURNITURE_KINDS=new Set(customFurniture.map(it=>it.kind));
 customFurniture.forEach(it=>{FURNITURE_IMAGES[it.kind]=[it.dataUrl];});
 function saveCustomFurniture(){
   try{localStorage.setItem(CUSTOM_FURNITURE_KEY,JSON.stringify(customFurniture));}
-  catch(e){alert('Não foi possível salvar a imagem no navegador (ela pode ser grande demais). O item vai funcionar nesta sessão, mas pode não aparecer depois de recarregar a página.');}
+  catch(e){customAlert('Não foi possível salvar a imagem no navegador (ela pode ser grande demais). O item vai funcionar nesta sessão, mas pode não aparecer depois de recarregar a página.');}
+}
+function preloadFurnitureImage(url){
+  return new Promise(resolve=>{
+    const cache=getFurnitureImage(url,()=>resolve(cache));
+    if(cache.loaded||cache.failed)resolve(cache);
+  });
 }
 function addCustomFurnitureItem(label,w,h,dataUrl){
   const kind='custom_'+newId();

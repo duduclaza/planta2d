@@ -188,14 +188,17 @@ function bindCustomLibrary(){
       reader.onload=async()=>{
         const rawUrl=reader.result;
         const dataUrl=await maybeRemoveBackground(rawUrl);
-        getFurnitureImage(dataUrl,()=>{
-          if(!_imgCache[dataUrl]||!_imgCache[dataUrl].loaded){alert('Não foi possível carregar essa imagem.');return;}
-          const name=(prompt('Nome do item:','Meu móvel')||'').trim()||'Meu móvel';
-          const wCm=Math.max(5,parseFloat((prompt('Largura (cm):','60')||'60').replace(',','.'))||60);
-          const hCm=Math.max(5,parseFloat((prompt('Profundidade (cm):','60')||'60').replace(',','.'))||60);
-          addCustomFurnitureItem(name,wCm/100,hCm/100,dataUrl);
-          buildFurni();
-        });
+        const cache=await preloadFurnitureImage(dataUrl);
+        if(!cache.loaded){await customAlert('Não foi possível carregar essa imagem.');return;}
+        const values=await customForm('Adicionar imagem',[
+          {key:'name',label:'Nome do item',value:'Meu móvel'},
+          {key:'w',label:'Largura',type:'number',value:60,suffix:'cm'},
+          {key:'h',label:'Profundidade',type:'number',value:60,suffix:'cm'}
+        ],{okText:'Adicionar'});
+        if(!values)return;
+        const[name,wCm,hCm]=values;
+        addCustomFurnitureItem((name||'').trim()||'Meu móvel',Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),dataUrl);
+        buildFurni();
       };
       reader.readAsDataURL(file);
     };
@@ -210,20 +213,24 @@ function bindCustomLibrary(){
       document.querySelectorAll('#libFurni .libitem').forEach(x=>x.classList.toggle('sel',x===d));
       setHint('Clique no desenho pra soltar: '+it.label);
     };
-    d.oncontextmenu=(e)=>{
+    d.oncontextmenu=async(e)=>{
       e.preventDefault();
-      const name=(prompt('Nome do item:',it.label)||'').trim()||it.label;
-      const wCm=Math.max(5,parseFloat((prompt('Largura (cm):',Math.round(it.w*100))||'').replace(',','.'))||Math.round(it.w*100));
-      const hCm=Math.max(5,parseFloat((prompt('Profundidade (cm):',Math.round(it.h*100))||'').replace(',','.'))||Math.round(it.h*100));
-      it.label=name;it.w=wCm/100;it.h=hCm/100;
+      const values=await customForm('Editar item',[
+        {key:'name',label:'Nome do item',value:it.label},
+        {key:'w',label:'Largura',type:'number',value:Math.round(it.w*100),suffix:'cm'},
+        {key:'h',label:'Profundidade',type:'number',value:Math.round(it.h*100),suffix:'cm'}
+      ],{okText:'Salvar'});
+      if(!values)return;
+      const[name,wCm,hCm]=values;
+      it.label=(name||'').trim()||it.label;it.w=Math.max(0.05,wCm/100);it.h=Math.max(0.05,hCm/100);
       saveCustomFurniture();
       buildFurni();
     };
   });
   document.querySelectorAll('#libFurni .customDel').forEach(b=>{
-    b.onclick=(e)=>{
+    b.onclick=async(e)=>{
       e.stopPropagation();
-      if(!confirm('Remover este item da sua biblioteca?'))return;
+      if(!await customConfirm('Remover este item da sua biblioteca?',{danger:true,okText:'Remover'}))return;
       removeCustomFurnitureItem(b.dataset.del);
       buildFurni();
     };

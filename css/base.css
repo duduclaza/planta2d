@@ -14,6 +14,7 @@ header{display:flex;align-items:center;gap:12px;padding:0 14px;height:54px;backg
 .hbtn{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);color:var(--ink);padding:7px 11px;border-radius:8px;font:600 13px 'Inter';cursor:pointer;transition:.12s;white-space:nowrap}
 .hbtn:hover{border-color:var(--accent-2);transform:translateY(-1px)}
 .hbtn.primary{background:var(--accent);border-color:var(--accent);color:#241402}
+.hbtn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
 .hbtn svg{display:block}
 .fileMenu{position:relative}
 .fileDrop{position:absolute;top:40px;left:0;min-width:178px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.45);padding:6px;display:none;z-index:80}

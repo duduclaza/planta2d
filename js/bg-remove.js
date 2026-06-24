@@ -66,7 +66,8 @@ async function maybeRemoveBackground(dataUrl){
     const{color,uniform}=detectBackgroundColor(canvas);
     if(!uniform)return dataUrl;
     const swatch=`rgb(${Math.round(color[0])}, ${Math.round(color[1])}, ${Math.round(color[2])})`;
-    if(!confirm(`Detectamos um fundo de cor sólida nessa imagem (${swatch}). Remover o fundo automaticamente?`))return dataUrl;
+    const msg=`Detectamos um fundo de cor sólida nessa imagem <span style="display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;border:1px solid rgba(255,255,255,.3);background:${swatch}"></span>. Remover o fundo automaticamente?`;
+    if(!await customConfirm(msg,{okText:'Remover fundo',cancelText:'Manter original'}))return dataUrl;
     removeBackgroundByColor(canvas,color);
     return canvas.toDataURL('image/png');
   }catch(e){console.warn('Falha ao tentar remover o fundo',e);return dataUrl;}
