@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Garante que o header Authorization chegue até o PHP (alguns setups de Apache/PHP-FPM o escondem)
+CGIPassAuth On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+# Roteia tudo em /api/* para o front controller, preservando a URL original
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+# Bloqueia acesso direto a arquivos sensíveis
+<FilesMatch "^(config\.php)$">
+  Require all denied
+</FilesMatch>

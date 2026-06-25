@@ -176,9 +176,6 @@ async function showMyProjects(){
     catch(err){console.warn(err);}
   });
 }
-function moneyBRL(cents){
-  return (Number(cents||0)/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-}
 function styledFurnitureOptions(){
   const out=[];
   const add=(category,items)=>items.forEach(it=>{
@@ -287,34 +284,17 @@ async function showAdminManagement(){
   const summary=document.getElementById('adminSummary');
   showAdminView();
   renderAdminStyledAssetPanel();
-  if(listEl)listEl.innerHTML='<tr><td colspan="5" class="adminEmpty">Carregando clientes...</td></tr>';
+  if(listEl)listEl.innerHTML='<tr><td colspan="3" class="adminEmpty">Carregando clientes...</td></tr>';
   const data=await apiJson('/api/admin/users');
   const users=data.users||[];
-  const totals=users.reduce((acc,u)=>{acc.clients++;acc.projects+=Number(u.project_count||0);acc.spent+=Number(u.spent_cents||0);acc.free+=u.free_png_export?1:0;return acc;},{clients:0,projects:0,spent:0,free:0});
-  if(summary)summary.innerHTML=`<span><b>${totals.clients}</b> clientes</span><span><b>${totals.projects}</b> projetos</span><span><b>${moneyBRL(totals.spent)}</b> recebidos</span><span><b>${totals.free}</b> liberados</span>`;
+  const totals=users.reduce((acc,u)=>{acc.clients++;acc.projects+=Number(u.project_count||0);return acc;},{clients:0,projects:0});
+  if(summary)summary.innerHTML=`<span><b>${totals.clients}</b> clientes</span><span><b>${totals.projects}</b> projetos</span>`;
   if(!listEl)return;
-  if(!users.length){listEl.innerHTML='<tr><td colspan="5" class="adminEmpty">Nenhum cliente cadastrado.</td></tr>';return;}
+  if(!users.length){listEl.innerHTML='<tr><td colspan="3" class="adminEmpty">Nenhum cliente cadastrado.</td></tr>';return;}
   listEl.innerHTML=users.map(u=>`<tr data-id="${u.id}">
     <td><b>${escapeHtml(u.name||'Sem nome')}</b><small>${escapeHtml(u.email||'')}</small>${u.is_super_admin?'<em>Super Admin</em>':''}</td>
     <td>${Number(u.project_count||0)}</td>
-    <td>${moneyBRL(u.spent_cents)}</td>
-    <td>${Number(u.paid_exports||0)}</td>
-    <td><label class="adminSwitch"><input type="checkbox" ${u.free_png_export?'checked':''}><span></span></label></td>
   </tr>`).join('');
-  listEl.querySelectorAll('tr[data-id]').forEach(row=>{
-    const input=row.querySelector('input[type="checkbox"]');
-    input.onchange=async()=>{
-      input.disabled=true;
-      try{
-        const saved=await apiJson('/api/admin/users/'+encodeURIComponent(row.dataset.id),{method:'PATCH',body:JSON.stringify({free_png_export:input.checked})});
-        if(authUser&&authUser.id===saved.id){authUser.can_export_free=saved.free_png_export;localStorage.setItem('planta2d:authUser',JSON.stringify(authUser));}
-        setHint(saved.free_png_export?'Cliente liberado para baixar sem pagar.':'Cliente voltou a pagar para baixar.');
-      }catch(err){
-        input.checked=!input.checked;
-        setHint(err.message||'Nao foi possivel salvar a permissao.');
-      }finally{input.disabled=false;}
-    };
-  });
 }
 function askProjectName(initial){
   return new Promise(resolve=>{
@@ -408,173 +388,11 @@ if(projNameInput)projNameInput.addEventListener('input',scheduleAutoSave);
 function downloadPngUrl(url){
   const a=document.createElement('a');a.href=url;a.download=(document.getElementById('projName').value||'planta').replace(/\s+/g,'_')+'.png';a.click();
 }
-function ensurePixModal(){
-  let modal=document.getElementById('pixExportModal');
-  if(modal)return modal;
-  modal=document.createElement('div');
-  modal.id='pixExportModal';
-  modal.className='pixExportModal';
-  document.body.appendChild(modal);
-  return modal;
-}
-function setPixModalState(modal,state,msg){
-  const status=modal.querySelector('.pixStatus');
-  if(status){status.className='pixStatus '+(state||'');status.textContent=msg||'';}
-}
-function closePixModal(){
-  const modal=document.getElementById('pixExportModal');
-  if(!modal)return;
-  if(modal._stripeCheckout&&typeof modal._stripeCheckout.destroy==='function'){
-    try{modal._stripeCheckout.destroy();}catch(err){console.warn(err);}
-    modal._stripeCheckout=null;
-  }
-  const oldUrl=modal.dataset.qrObjectUrl;
-  if(oldUrl)URL.revokeObjectURL(oldUrl);
-  clearInterval(Number(modal.dataset.pollTimer||0));
-  modal.classList.remove('show');
-}
-async function loadPixQrImage(modal,url){
-  const img=modal.querySelector('.pixQr');
-  img.style.display='none';
-  img.removeAttribute('src');
-  if(/^data:image\//.test(String(url||''))){
-    img.src=url;
-    img.style.display='block';
-    return;
-  }
-  const res=await fetch(url,{headers:{...(typeof authHeaders==='function'?authHeaders():{})}});
-  if(!res.ok)throw new Error('Nao foi possivel carregar o QR Code.');
-  const objectUrl=URL.createObjectURL(await res.blob());
-  modal.dataset.qrObjectUrl=objectUrl;
-  img.src=objectUrl;
-  img.style.display='block';
-}
-async function waitForPixPayment(paymentId,pngUrl,modal){
-  clearInterval(Number(modal.dataset.pollTimer||0));
-  const downloadBtn=modal.querySelector('#pixDownloadBtn');
-  const check=async()=>{
-    const data=await apiJson('/api/payments/'+encodeURIComponent(paymentId)+'/status');
-    if(data.paid){
-      clearInterval(Number(modal.dataset.pollTimer||0));
-      setPixModalState(modal,'paid','Pagamento confirmado. Baixando PNG...');
-      downloadBtn.disabled=false;
-      downloadBtn.textContent='Baixar PNG';
-      downloadPngUrl(pngUrl);
-      setTimeout(closePixModal,900);
-      return true;
-    }
-    return false;
-  };
-  downloadBtn.onclick=async()=>{try{if(!(await check()))setPixModalState(modal,'waiting','Ainda aguardando confirmacao do PagBank.');}catch(err){setPixModalState(modal,'error',err.message||'Erro ao consultar pagamento.');}};
-  const timer=setInterval(async()=>{try{await check();}catch(err){console.warn(err);}},4000);
-  modal.dataset.pollTimer=String(timer);
-  try{await check();}catch(err){console.warn(err);}
-}
-async function waitForStripePayment(paymentId,pngUrl,modal){
-  clearInterval(Number(modal.dataset.pollTimer||0));
-  const downloadBtn=modal.querySelector('#pixDownloadBtn');
-  const check=async()=>{
-    const data=await apiJson('/api/payments/'+encodeURIComponent(paymentId)+'/status');
-    if(data.paid){
-      clearInterval(Number(modal.dataset.pollTimer||0));
-      setPixModalState(modal,'paid','Pagamento confirmado. Baixando PNG...');
-      downloadBtn.disabled=false;
-      downloadBtn.textContent='Baixar PNG';
-      downloadPngUrl(pngUrl);
-      setTimeout(closePixModal,900);
-      return true;
-    }
-    return false;
-  };
-  downloadBtn.onclick=async()=>{try{if(!(await check()))setPixModalState(modal,'waiting','Ainda aguardando confirmacao do Stripe.');}catch(err){setPixModalState(modal,'error',err.message||'Erro ao consultar pagamento.');}};
-  const timer=setInterval(async()=>{try{await check();}catch(err){console.warn(err);}},3500);
-  modal.dataset.pollTimer=String(timer);
-  try{await check();}catch(err){console.warn(err);}
-}
-async function mountStripeCheckout(modal,payment){
-  if(!payment.stripe_client_secret||!payment.stripe_publishable_key||typeof Stripe!=='function')return false;
-  const stripeMount=modal.querySelector('#stripeEmbeddedCheckout');
-  if(!stripeMount)return false;
-  try{
-    const stripe=Stripe(payment.stripe_publishable_key);
-    const checkout=await stripe.initEmbeddedCheckout({clientSecret:payment.stripe_client_secret});
-    modal._stripeCheckout=checkout;
-    checkout.mount('#stripeEmbeddedCheckout');
-    return true;
-  }catch(err){
-    console.warn(err);
-    return false;
-  }
-}
-async function startPaidPngExport(){
+function exportPng(){
   downloadPngUrl(renderExport(2.2));
-  setHint('PNG exportado sem cobranca.');
-  return;
-  if(authUser&&authUser.can_export_free){
-    downloadPngUrl(renderExport(2.2));
-    setHint('Exportacao PNG liberada sem pagamento.');
-    return;
-  }
-  if(!canUseCloud()){setHint('Abra o app pelo servidor para pagar e exportar PNG.');downloadPngUrl(renderExport(2.2));return;}
-  const pngUrl=renderExport(2.2);
-  const modal=ensurePixModal();
-  modal.innerHTML=`<div class="pixCard">
-    <div class="pixHead"><b>Exportar PNG</b><button id="pixClose" aria-label="Fechar">×</button></div>
-    <div class="pixBody">
-      <div class="pixQrBox"><span class="pixQrLoading">Gerando QR Code...</span><img class="pixQr" alt="QR Code PIX" style="display:none"></div>
-      <div class="pixInfo">
-        <strong>Pagamento de R$ 1,99</strong>
-        <p>Conclua o pagamento para liberar o download automatico do PNG.</p>
-        <textarea class="pixCopy" readonly></textarea>
-        <div class="pixActions">
-          <button class="hbtn" id="pixCopyBtn">Copiar codigo</button>
-          <button class="hbtn primary" id="pixDownloadBtn" disabled>Aguardando pagamento</button>
-        </div>
-        <div class="pixStatus waiting">Gerando cobranca...</div>
-      </div>
-    </div>
-  </div>`;
-  modal.classList.add('show');
-  modal.onclick=e=>{if(e.target===modal)closePixModal();};
-  modal.querySelector('#pixClose').onclick=closePixModal;
-  try{
-    const payment=await apiJson('/api/payments/export-png',{method:'POST',body:JSON.stringify({project_name:document.getElementById('projName').value||'Planta baixa'})});
-    if(payment.provider==='stripe'){
-      const body=modal.querySelector('.pixBody');
-      if(body)body.classList.add('stripeMode');
-      const qrBox=modal.querySelector('.pixQrBox');
-      if(qrBox)qrBox.outerHTML='<div class="stripeCheckoutBox" id="stripeEmbeddedCheckout"><span class="pixQrLoading">Carregando Stripe...</span></div>';
-      modal.querySelector('.pixInfo strong').textContent='Pagamento de R$ 1,99';
-      modal.querySelector('.pixInfo p').textContent='Conclua o checkout seguro abaixo. Assim que o pagamento confirmar, o PNG baixa automaticamente.';
-      const copy=modal.querySelector('.pixCopy');
-      copy.value=payment.checkout_url||'';
-      copy.readOnly=true;
-      const openBtn=modal.querySelector('#pixCopyBtn');
-      openBtn.textContent=payment.checkout_url?'Abrir em nova aba':'Atualizar status';
-      openBtn.onclick=()=>{if(payment.checkout_url)window.open(payment.checkout_url,'_blank','noopener');};
-      const mounted=await mountStripeCheckout(modal,payment);
-      if(!mounted&&payment.checkout_url)window.open(payment.checkout_url,'_blank','noopener');
-      if(!mounted){
-        if(body)body.classList.add('hostedFallback');
-        const stripeBox=modal.querySelector('#stripeEmbeddedCheckout');
-        if(stripeBox)stripeBox.innerHTML='<span class="pixQrLoading">Checkout aberto em nova aba.</span>';
-        modal.querySelector('.pixInfo p').textContent='O checkout seguro foi aberto em uma nova aba. Depois do pagamento, volte aqui para baixar automaticamente.';
-      }
-      setPixModalState(modal,'waiting','Aguardando pagamento no Stripe...');
-      await waitForStripePayment(payment.id,pngUrl,modal);
-      return;
-    }
-    modal.querySelector('.pixCopy').value=payment.qr_text||'';
-    modal.querySelector('#pixCopyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(payment.qr_text||'');setPixModalState(modal,'waiting','Codigo PIX copiado. Aguardando pagamento...');}catch(err){setPixModalState(modal,'error','Nao foi possivel copiar automaticamente.');}};
-    await loadPixQrImage(modal,payment.qr_image_url);
-    setPixModalState(modal,'waiting','Aguardando confirmacao do pagamento...');
-    await waitForPixPayment(payment.id,pngUrl,modal);
-  }catch(err){
-    console.warn(err);
-    setPixModalState(modal,'error',err.message||'Nao foi possivel gerar o PIX.');
-  }
+  setHint('PNG exportado.');
 }
-document.getElementById('btnPng').onclick=startPaidPngExport;
+document.getElementById('btnPng').onclick=exportPng;
 document.getElementById('btnPrint').onclick=()=>{const url=renderExport(2.2);const w=window.open('');w.document.write(`<html><head><title>${document.getElementById('projName').value}</title></head><body style="margin:0;text-align:center"><img src="${url}" style="max-width:100%"><scr`+`ipt>onload=()=>print()</scr`+`ipt></body></html>`);w.document.close();};
 
 function bounds(){let mnx=Infinity,mny=Infinity,mxx=-Infinity,mxy=-Infinity,any=false;const ext=(x,y)=>{any=true;mnx=Math.min(mnx,x);mny=Math.min(mny,y);mxx=Math.max(mxx,x);mxy=Math.max(mxy,y);};

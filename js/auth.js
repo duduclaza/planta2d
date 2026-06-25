@@ -38,6 +38,8 @@ function setAuthSession(token, user) {
   updateAuthUi();
   if (authUser && typeof setTool === "function") setTool("select");
   if (authUser && typeof showProjectChoice === "function") showProjectChoice();
+  if (authUser && typeof loadCustomFurniture === "function") loadCustomFurniture();
+  if (!authUser && typeof clearCustomFurniture === "function") clearCustomFurniture();
 }
 
 function clearAuthSession() {

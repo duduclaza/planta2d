@@ -237,8 +237,8 @@ function bindCustomLibrary(){
         if(!values)return;
         let[name,wCm,hCm,cat]=values;
         cat=await resolveCategoryChoice(cat);if(!cat)return;
-        addCustomFurnitureItem((name||'').trim()||'Meu móvel',Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),dataUrl,cat);
-        buildFurni();
+        const kind=await addCustomFurnitureItem((name||'').trim()||'Meu móvel',Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),dataUrl,cat);
+        if(kind)buildFurni();
       };
       reader.readAsDataURL(file);
     };
@@ -258,16 +258,15 @@ function bindCustomLibrary(){
       if(!values)return;
       let[name,wCm,hCm,cat]=values;
       cat=await resolveCategoryChoice(cat);if(!cat)return;
-      it.label=(name||'').trim()||it.label;it.w=Math.max(0.05,wCm/100);it.h=Math.max(0.05,hCm/100);it.category=cat;
-      saveCustomFurniture();
-      buildFurni();
+      const ok=await updateCustomFurnitureItem(kind,(name||'').trim()||it.label,Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),cat);
+      if(ok)buildFurni();
     };
   });
   document.querySelectorAll('#libFurni .customDel').forEach(b=>{
     b.onclick=async(e)=>{
       e.stopPropagation();
       if(!await customConfirm('Remover este item da sua biblioteca?',{danger:true,okText:'Remover'}))return;
-      removeCustomFurnitureItem(b.dataset.del);
+      await removeCustomFurnitureItem(b.dataset.del);
       buildFurni();
     };
   });
