@@ -217,8 +217,10 @@ function bindCustomLibrary(){
   const addBtn=document.getElementById('addCustomImage');
   if(addBtn)addBtn.onclick=()=>{
     const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-    inp.onchange=()=>{
+    inp.onchange=async()=>{
       const file=inp.files&&inp.files[0];if(!file)return;
+      const MAX_BYTES=5*1024*1024;
+      if(file.size>MAX_BYTES){await customAlert(`Essa imagem tem ${(file.size/1024/1024).toFixed(1)} MB. O tamanho máximo permitido é 5 MB.`);return;}
       const reader=new FileReader();
       reader.onload=async()=>{
         const rawUrl=reader.result;
