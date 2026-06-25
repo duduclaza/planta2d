@@ -15,9 +15,9 @@ function preloadFurnitureImage(url){
     if(cache.loaded||cache.failed)resolve(cache);
   });
 }
-function addCustomFurnitureItem(label,w,h,dataUrl){
+function addCustomFurnitureItem(label,w,h,dataUrl,category){
   const kind='custom_'+newId();
-  customFurniture.push({kind,label,w,h,dataUrl});
+  customFurniture.push({kind,label,w,h,dataUrl,category:category||'Minha biblioteca'});
   CUSTOM_FURNITURE_KINDS.add(kind);
   FURNITURE_IMAGES[kind]=[dataUrl];
   saveCustomFurniture();

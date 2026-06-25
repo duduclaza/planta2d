@@ -154,29 +154,64 @@ function buildFurnitureThemeControl(){
 function bindFurnitureThemeControl(){
   document.querySelectorAll('.furnTheme button').forEach(b=>b.onclick=()=>setFurnitureTheme(b.dataset.theme));
 }
-function buildFurni(){
-  buildGroupedLibrary('libFurni',FURNI,'furni',markLib2);
-  const el=document.getElementById('libFurni');
-  if(el){
-    el.insertAdjacentHTML('afterbegin',buildFurnitureThemeControl());bindFurnitureThemeControl();
-    el.insertAdjacentHTML('beforeend',buildCustomLibraryHtml());bindCustomLibrary();
-  }
+function allFurnitureCategories(){
+  const names=FURNI.map(g=>g[0]);
+  const customCats=customFurniture.map(it=>it.category).filter(Boolean);
+  return Array.from(new Set([...names,...customCats]));
 }
-function buildCustomLibraryHtml(){
-  return `<div class="roomgrp open">
-    <button class="roomhead" type="button"><span>Minha biblioteca</span><b>${customFurniture.length}</b></button>
-    <div class="grid2 furnigrid">
-      <div class="libitem planitem addCustomItem" id="addCustomImage">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        <div class="nm">Adicionar imagem</div>
-      </div>
-      ${customFurniture.map(it=>`<div class="libitem planitem customItem" data-custom="${it.kind}" title="Clique direito pra editar nome/tamanho">
-        <button class="customDel" data-del="${it.kind}" title="Remover">×</button>
-        <canvas class="libicon"></canvas>
-        <div class="nm">${it.label}</div><div class="dm">${Math.round(it.w*100)}×${Math.round(it.h*100)} cm</div>
-      </div>`).join('')}
+async function resolveCategoryChoice(cat){
+  if(cat!=='__new__')return cat;
+  const nv=await customForm('Nova categoria',[{key:'cat',label:'Nome da categoria',value:''}],{okText:'Criar'});
+  if(!nv||!nv[0]||!nv[0].trim())return null;
+  return nv[0].trim();
+}
+function mergedFurnitureGroups(){
+  const groups=FURNI.map(([name,items])=>[name,items.map(it=>({kind:it[0],label:it[1],w:it[2],h:it[3]}))]);
+  const byName={};groups.forEach(g=>{byName[g[0]]=g[1];});
+  customFurniture.forEach(it=>{
+    const cat=it.category||'Minha biblioteca';
+    if(!byName[cat]){const arr=[];byName[cat]=arr;groups.push([cat,arr]);}
+    byName[cat].push({kind:it.kind,label:it.label,w:it.w,h:it.h,custom:true});
+  });
+  return groups;
+}
+function buildFurni(){
+  const el=document.getElementById('libFurni');
+  if(!el)return;
+  const groups=mergedFurnitureGroups();
+  let html=buildFurnitureThemeControl();
+  html+=`<div class="roomgrp open"><div class="grid2 furnigrid">
+    <div class="libitem planitem addCustomItem" id="addCustomImage">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <div class="nm">Adicionar imagem</div>
     </div>
-  </div>`;
+  </div></div>`;
+  groups.forEach(([grp,items],idx)=>{
+    if(!items.length)return;
+    html+=`<div class="roomgrp ${idx===0?'open':''}">
+    <button class="roomhead" type="button"><span>${grp}</span><b>${items.length}</b></button>
+    <div class="grid2 furnigrid">`;
+    items.forEach(it=>{html+=`<div class="libitem planitem${it.custom?' customItem':''}" data-furni="${it.kind}"${it.custom?' title="Clique direito pra editar"':''}>
+      ${it.custom?`<button class="customDel" data-del="${it.kind}" title="Remover">×</button>`:''}
+      <canvas class="libicon"></canvas>
+      <div class="nm">${it.label}</div><div class="dm">${it.w.toFixed(2).replace('.',',')}×${it.h.toFixed(2).replace('.',',')} m</div>
+    </div>`;});
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+  bindFurnitureThemeControl();
+  el.querySelectorAll('.roomhead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+  const flat={};groups.forEach(([,items])=>items.forEach(it=>flat[it.kind]=it));
+  el.querySelectorAll('.libitem[data-furni]').forEach(d=>{
+    const kind=d.dataset.furni,it=flat[kind];if(!it)return;
+    drawLibIcon(d.querySelector('canvas.libicon'),it.kind,it.w,it.h);
+    d.onclick=(e)=>{
+      if(e.target.closest('.customDel'))return;
+      pendingFurniture=[it.kind,it.label,it.w,it.h];setTool('furniture');markLib2(kind);
+      setHint('Clique no desenho pra soltar: '+it.label);
+    };
+  });
+  bindCustomLibrary();
 }
 function bindCustomLibrary(){
   const addBtn=document.getElementById('addCustomImage');
@@ -190,14 +225,17 @@ function bindCustomLibrary(){
         const dataUrl=await maybeRemoveBackground(rawUrl);
         const cache=await preloadFurnitureImage(dataUrl);
         if(!cache.loaded){await customAlert('Não foi possível carregar essa imagem.');return;}
+        const cats=allFurnitureCategories();
         const values=await customForm('Adicionar imagem',[
           {key:'name',label:'Nome do item',value:'Meu móvel'},
           {key:'w',label:'Largura',type:'number',value:60,suffix:'cm'},
-          {key:'h',label:'Profundidade',type:'number',value:60,suffix:'cm'}
+          {key:'h',label:'Profundidade',type:'number',value:60,suffix:'cm'},
+          {key:'cat',label:'Categoria',type:'select',value:cats[0]||'Minha biblioteca',options:[...cats,['__new__','+ Criar nova categoria…']]}
         ],{okText:'Adicionar'});
         if(!values)return;
-        const[name,wCm,hCm]=values;
-        addCustomFurnitureItem((name||'').trim()||'Meu móvel',Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),dataUrl);
+        let[name,wCm,hCm,cat]=values;
+        cat=await resolveCategoryChoice(cat);if(!cat)return;
+        addCustomFurnitureItem((name||'').trim()||'Meu móvel',Math.max(0.05,wCm/100),Math.max(0.05,hCm/100),dataUrl,cat);
         buildFurni();
       };
       reader.readAsDataURL(file);
@@ -205,24 +243,20 @@ function bindCustomLibrary(){
     inp.click();
   };
   document.querySelectorAll('#libFurni .customItem').forEach(d=>{
-    const kind=d.dataset.custom,it=customFurniture.find(c=>c.kind===kind);if(!it)return;
-    drawLibIcon(d.querySelector('canvas.libicon'),it.kind,it.w,it.h);
-    d.onclick=(e)=>{
-      if(e.target.closest('.customDel'))return;
-      pendingFurniture=[it.kind,it.label,it.w,it.h];setTool('furniture');
-      document.querySelectorAll('#libFurni .libitem').forEach(x=>x.classList.toggle('sel',x===d));
-      setHint('Clique no desenho pra soltar: '+it.label);
-    };
+    const kind=d.dataset.furni,it=customFurniture.find(c=>c.kind===kind);if(!it)return;
     d.oncontextmenu=async(e)=>{
       e.preventDefault();
+      const cats=allFurnitureCategories();
       const values=await customForm('Editar item',[
         {key:'name',label:'Nome do item',value:it.label},
         {key:'w',label:'Largura',type:'number',value:Math.round(it.w*100),suffix:'cm'},
-        {key:'h',label:'Profundidade',type:'number',value:Math.round(it.h*100),suffix:'cm'}
+        {key:'h',label:'Profundidade',type:'number',value:Math.round(it.h*100),suffix:'cm'},
+        {key:'cat',label:'Categoria',type:'select',value:it.category||cats[0],options:[...cats,['__new__','+ Criar nova categoria…']]}
       ],{okText:'Salvar'});
       if(!values)return;
-      const[name,wCm,hCm]=values;
-      it.label=(name||'').trim()||it.label;it.w=Math.max(0.05,wCm/100);it.h=Math.max(0.05,hCm/100);
+      let[name,wCm,hCm,cat]=values;
+      cat=await resolveCategoryChoice(cat);if(!cat)return;
+      it.label=(name||'').trim()||it.label;it.w=Math.max(0.05,wCm/100);it.h=Math.max(0.05,hCm/100);it.category=cat;
       saveCustomFurniture();
       buildFurni();
     };

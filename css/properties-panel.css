@@ -18,6 +18,8 @@
 .prow label{display:block;font:600 11px 'Inter';text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
 .prow input[type=text],.prow input[type=number]{width:100%;background:var(--chrome);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:9px 10px;font:600 14px var(--mono)}
 .prow input:focus{outline:none;border-color:var(--accent-2)}
+.prow select{width:100%;background:var(--chrome);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:9px 10px;font:600 13px 'Inter'}
+.prow select:focus{outline:none;border-color:var(--accent-2)}
 .prow .unit{position:relative}
 .prow .unit::after{content:attr(data-u);position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted);font:500 12px 'Inter';pointer-events:none}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}

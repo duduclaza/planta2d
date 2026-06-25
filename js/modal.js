@@ -9,7 +9,13 @@ function showFormModal({title,message,fields,okText,cancelText,danger}){
   fields=fields||[];
   return new Promise(resolve=>{
     const modal=ensureCustomModal();
-    const fieldsHtml=fields.map((f,i)=>`<div class="prow"><label>${f.label}</label><div class="unit" data-u="${f.suffix||''}"><input type="${f.type||'text'}" id="modalField${i}" value="${(f.value??'').toString().replace(/"/g,'&quot;')}"></div></div>`).join('');
+    const fieldsHtml=fields.map((f,i)=>{
+      if(f.type==='select'){
+        const opts=(f.options||[]).map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return `<option value="${String(v).replace(/"/g,'&quot;')}" ${v===f.value?'selected':''}>${l}</option>`;}).join('');
+        return `<div class="prow"><label>${f.label}</label><select id="modalField${i}">${opts}</select></div>`;
+      }
+      return `<div class="prow"><label>${f.label}</label><div class="unit" data-u="${f.suffix||''}"><input type="${f.type||'text'}" id="modalField${i}" value="${(f.value??'').toString().replace(/"/g,'&quot;')}"></div></div>`;
+    }).join('');
     modal.innerHTML=`<div class="namecard">
       <h3>${title}</h3>
       ${message?`<p>${message}</p>`:''}
@@ -36,7 +42,7 @@ function showFormModal({title,message,fields,okText,cancelText,danger}){
       if(e.key==='Enter'){e.preventDefault();document.getElementById('modalOk').click();}
       if(e.key==='Escape')close(null);
     };
-    setTimeout(()=>{if(inputs[0]){inputs[0].focus();inputs[0].select();}else document.getElementById('modalOk').focus();},30);
+    setTimeout(()=>{if(inputs[0]){inputs[0].focus();if(inputs[0].select)inputs[0].select();}else document.getElementById('modalOk').focus();},30);
   });
 }
 function customForm(title,fields,opts){
